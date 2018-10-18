@@ -1,24 +1,23 @@
 ﻿using FileFormat.Sqlite.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FileFormat.Sqlite
 {
     public sealed class FileConnection
     {
-        public FileConnection(string path)
+        public FileConnection(string filePath)
         {
-            Path = path;
-            if (!File.Exists(path))
+            FilePath = filePath;
+            if (!File.Exists(filePath))
             {
                 using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FileFormat.Sqlite.template.db"))
                 {
-                    using (var fileStream = new FileStream(path, FileMode.CreateNew))
+                    using (var fileStream = new FileStream(filePath, FileMode.CreateNew))
                     {
                         stream.CopyTo(fileStream);
                     }
@@ -26,32 +25,69 @@ namespace FileFormat.Sqlite
             }
         }
 
-        private string Path { get; }
+        private string FilePath { get; }
 
-        public async Task SaveData(string key, byte[] value)
+        private char Separator => '.';
+
+        private string RootName => string.Empty;
+
+        public async Task SaveDataAsync(string fullName, byte[] value)
         {
-            if (value == null)
-                throw new Exception("数据不能为空");
-            using (var context = new FileFormatContext(Path))
+            fullName.VerifyFullName();
+            value.VerifyData();
+            using (var context = new FileFormatContext(FilePath))
             {
-                var data = await context.Datas.FindAsync(key);
+                string[] names = fullName.Split(Separator);
+                var node = await context.Nodes.FindAsync(1);
+                for (int i = 0; i < names.Length - 1; i++)
+                {
+                    var name = names[i];
+                    name.VerifyName();
+                    var newNode = await context.Entry(node).Collection(b => b.ChildrenNodes).Query().FirstOrDefaultAsync(n => n.Name == name);
+                    if (newNode == null)
+                    {
+                        newNode = new Node(name, node.Key);
+                        await context.Nodes.AddAsync(newNode);
+                    }
+                    node = newNode;
+                }
+                var dataName = names[names.Length - 1];
+                dataName.VerifyName();
+                var data = await context.Entry(node).Collection(b => b.ChildrenDatas).Query().FirstOrDefaultAsync(d => d.Name == dataName);
                 if (data == null)
-                    await context.Datas.AddAsync(new Data(key, value));
+                    await context.Datas.AddAsync(new Data(dataName, value, node.Key));
                 else
                     data.Value = value;
                 await context.SaveChangesAsync();
             }
         }
 
-        public async Task<byte[]> ReadData(string key)
+        public async Task<byte[]> ReadDataAsync(string fullName)
         {
-            using (var context = new FileFormatContext(Path))
+            fullName.VerifyFullName();
+            using (var context = new FileFormatContext(FilePath))
             {
-                var data = await context.Datas.FindAsync(key);
+                string[] names = fullName.Split(Separator);
+                var node = await context.FindNodeAsync(names.Take(names.Length - 1));
+                string dataName = names[names.Length - 1];
+                var data = await context.GetDataAsync(node, dataName);
                 if (data == null)
-                    throw new Exception("不存在该文件");
+                    throw new Exception($"该节点不存在为{dataName}的数据");
                 return data.Value;
             }
         }
+
+        public async Task DeleteNode(string fullName)
+        {
+
+        }
+
+        //public string[] GetChildrenKeys(string key)
+        //{
+        //    using (var context = new FileFormatContext(FilePath))
+        //    {
+        //        return context.Datas.Select(d => d.Key).Where(k => k.StartsWith(key)).ToArray();
+        //    }
+        //}
     }
 }

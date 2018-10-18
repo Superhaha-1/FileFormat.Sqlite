@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -30,13 +31,17 @@ namespace FileFormat.Sqlite.Wpf
 
         private FileConnection Connection { get; }
 
-        private void SetImage(byte[] data)
+        private string Path { get; } = @"Test.jpg";
+
+        private string Key { get; } = "Images.Images.TestImage";
+
+        private void ShowImage(byte[] data)
         {
-            using (var stream = new MemoryStream(data))
+            using (MemoryStream ms = new MemoryStream(data))
             {
                 BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
-                bitmapImage.StreamSource = stream;
+                bitmapImage.StreamSource = ms;
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                 bitmapImage.EndInit();
                 bitmapImage.Freeze();
@@ -46,20 +51,65 @@ namespace FileFormat.Sqlite.Wpf
 
         private void Button_LoadImage_Click(object sender, RoutedEventArgs e)
         {
-            Image_Local.Source = new BitmapImage(new Uri("Test.jpg", UriKind.Relative));
+            Stopwatch stopwatch = new Stopwatch();
+            byte[] data = null;
+            stopwatch.Start();
+            using (var stream = new FileStream(Path, FileMode.Open))
+            {
+                using (BinaryReader br = new BinaryReader(stream))
+                {
+                    data = br.ReadBytes((int)stream.Length);
+                }
+            }
+            stopwatch.Stop();
+            TextBox_LoadImage.Text = stopwatch.ElapsedMilliseconds.ToString();
+            ShowImage(data);
         }
 
         private async void Button_SaveImage_Click(object sender, RoutedEventArgs e)
         {
-            //using (BinaryReader br = new BinaryReader(this.get))
-            //{
-            //    await Connection.SaveData("TestImage", br.ReadBytes((int)stream.Length));
-            //}
+            using (var stream = new FileStream(Path, FileMode.Open))
+            {
+                using (BinaryReader br = new BinaryReader(stream))
+                {
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
+                    await Connection.SaveDataAsync(Key, br.ReadBytes((int)stream.Length));
+                    stopwatch.Stop();
+                    TextBox_SaveImage.Text = stopwatch.ElapsedMilliseconds.ToString();
+                }
+            }
         }
 
-        private void Button_ReadImage_Click(object sender, RoutedEventArgs e)
+        private async void Button_ReadImage_Click(object sender, RoutedEventArgs e)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var data = await Connection.ReadDataAsync(Key);
+            stopwatch.Stop();
+            TextBox_ReadImage.Text = stopwatch.ElapsedMilliseconds.ToString();
+            ShowImage(data);
+        }
 
+        private async void Button_Test_Click(object sender, RoutedEventArgs e)
+        {
+            //byte[] data = null;
+            //using (var stream = new FileStream(Path, FileMode.Open))
+            //{
+            //    using (BinaryReader br = new BinaryReader(stream))
+            //    {
+            //        data = br.ReadBytes((int)stream.Length);
+            //    }
+            //}
+            //Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
+            //var keys = Connection.GetChildrenKeys("TestGroup");
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    await Connection.SaveDataAsync($@"TestGroup\{i}", data);
+            //}
+            //stopwatch.Stop();
+            //TextBox_Test.Text = stopwatch.ElapsedMilliseconds.ToString();
         }
     }
 }

@@ -8,14 +8,30 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Image Grid.Column="0" Margin="5" x:Name="Image_Local"/>
-        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="5">
-            <Button x:Name="Button_LoadImage" Click="Button_LoadImage_Click" Margin="5" Content="加载图片"/>
-            <Button x:Name="Button_SaveImage" Click="Button_SaveImage_Click" Margin="5" Content="保存图片"/>
-            <Button x:Name="Button_ReadImage" Click="Button_ReadImage_Click" Margin="5" Content="读取图片"/>
-        </StackPanel>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="Button_LoadImage" Click="Button_LoadImage_Click" Margin="5" Content="加载图片" Grid.Row="0" Grid.Column="0"/>
+            <TextBox x:Name="TextBox_LoadImage" Margin="5" Grid.Row="0" Grid.Column="1"/>
+            <Button x:Name="Button_SaveImage" Click="Button_SaveImage_Click" Margin="5" Content="保存图片" Grid.Row="1" Grid.Column="0"/>
+            <TextBox x:Name="TextBox_SaveImage" Margin="5" Grid.Row="1" Grid.Column="1"/>
+            <Button x:Name="Button_ReadImage" Click="Button_ReadImage_Click" Margin="5" Content="读取图片" Grid.Row="2" Grid.Column="0"/>
+            <TextBox x:Name="TextBox_ReadImage" Margin="5" Grid.Row="2" Grid.Column="1"/>
+            <Button x:Name="Button_Test" Click="Button_Test_Click" Margin="5" Content="测试" Grid.Row="3" Grid.Column="0"/>
+            <TextBox x:Name="TextBox_Test" Margin="5" Grid.Row="3" Grid.Column="1"/>
+        </Grid>
     </Grid>
 </Window>

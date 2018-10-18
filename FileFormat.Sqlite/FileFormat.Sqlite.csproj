@@ -138,12 +138,14 @@
   <ItemGroup>
     <Compile Include="FileConnection.cs" />
     <Compile Include="FileFormatContext.cs" />
-    <Compile Include="Migrations\20181017085001_InitialCreate.cs" />
-    <Compile Include="Migrations\20181017085001_InitialCreate.designer.cs">
-      <DependentUpon>20181017085001_InitialCreate.cs</DependentUpon>
+    <Compile Include="FileFormatHelper.cs" />
+    <Compile Include="Migrations\20181018071225_InitialCreate.cs" />
+    <Compile Include="Migrations\20181018071225_InitialCreate.designer.cs">
+      <DependentUpon>20181018071225_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\FileFormatContextModelSnapshot.cs" />
     <Compile Include="Models\Data.cs" />
+    <Compile Include="Models\Node.cs" />
     <Compile Include="Models\Parameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
