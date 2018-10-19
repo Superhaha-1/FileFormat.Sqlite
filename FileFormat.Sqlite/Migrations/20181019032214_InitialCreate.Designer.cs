@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FileFormat.Sqlite.Migrations
 {
     [DbContext(typeof(FileFormatContext))]
-    [Migration("20181018071225_InitialCreate")]
+    [Migration("20181019032214_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -93,23 +93,18 @@ namespace FileFormat.Sqlite.Wpf
 
         private async void Button_Test_Click(object sender, RoutedEventArgs e)
         {
-            //byte[] data = null;
-            //using (var stream = new FileStream(Path, FileMode.Open))
-            //{
-            //    using (BinaryReader br = new BinaryReader(stream))
-            //    {
-            //        data = br.ReadBytes((int)stream.Length);
-            //    }
-            //}
-            //Stopwatch stopwatch = new Stopwatch();
-            //stopwatch.Start();
-            //var keys = Connection.GetChildrenKeys("TestGroup");
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    await Connection.SaveDataAsync($@"TestGroup\{i}", data);
-            //}
-            //stopwatch.Stop();
-            //TextBox_Test.Text = stopwatch.ElapsedMilliseconds.ToString();
+            var data = await Connection.ReadDataAsync(Key);
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            using (var nodeConnection = await Connection.ConnectNodeAsync("Images.Images"))
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    await nodeConnection.SaveDataAsync(i.ToString(), data);
+                }
+            }
+            stopwatch.Stop();
+            TextBox_Test.Text = stopwatch.ElapsedMilliseconds.ToString();
         }
     }
 }
