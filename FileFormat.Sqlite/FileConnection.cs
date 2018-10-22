@@ -1,7 +1,4 @@
-﻿using FileFormat.Sqlite.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -27,110 +24,113 @@ namespace FileFormat.Sqlite
 
         private string FilePath { get; }
 
-        private char Separator => '.';
-
         private string RootName => string.Empty;
 
+        /// <summary>
+        /// 连接至根节点
+        /// </summary>
+        /// <returns></returns>
         public async Task<NodeConnection> ConnectRootNodeAsync()
         {
             var context = new FileFormatContext(FilePath);
             return new NodeConnection(context, await context.GetRootNodeAsync());
         }
 
+        /// <summary>
+        /// 连接至节点
+        /// </summary>
+        /// <param name="fullName"></param>
+        /// <returns></returns>
         public async Task<NodeConnection> ConnectNodeAsync(string fullName)
         {
-            fullName.VerifyFullName();
-            var context = new FileFormatContext(FilePath);
-            string[] names = fullName.Split(Separator);
+            var connection = await ConnectRootNodeAsync();
             try
             {
-                var node = await context.FindNodeAsync(names);
-                return new NodeConnection(context, node);
+                string[] names = fullName.GetChidrenNames();
+                foreach (var name in names)
+                    await connection.MoveDownToAsync(name);
+                return connection;
             }
             catch
             {
-                context.Dispose();
+                connection.Dispose();
                 throw;
             }
         }
 
+        /// <summary>
+        /// 新建节点
+        /// </summary>
+        /// <param name="fullName"></param>
+        /// <returns></returns>
         public async Task CreateNodeAsync(string fullName)
         {
-            fullName.VerifyFullName();
-            using (var context = new FileFormatContext(FilePath))
+            string[] names = fullName.GetChidrenNames();
+            using (var connection = await ConnectRootNodeAsync())
             {
-                string[] names = fullName.Split(Separator);
-                Node node = await context.GetRootNodeAsync();
                 foreach(var name in names)
-                {
-                    var node_new = await context.GetNodeAsync(node, name);
-                    if(node_new == null)
-                    {
-                        node_new = new Node(name, node.Key);
-                        await context.Nodes.AddAsync(node_new);
-                        await context.SaveChangesAsync();
-                    }
-                    node = node_new;
-                }
-            }
-        }
-
-        public async Task SaveDataAsync(string fullName, byte[] value)
-        {
-            fullName.VerifyFullName();
-            value.VerifyData();
-            using (var context = new FileFormatContext(FilePath))
-            {
-                string[] names = fullName.Split(Separator);
-                var node = await context.FindNodeAsync(names.Take(names.Length - 1));
-                string dataName = names[names.Length - 1];
-                var data = await context.GetDataAsync(node, dataName);
-                if (data == null)
-                    await context.Datas.AddAsync(new Data(dataName, value, node.Key));
-                else
-                    data.Value = value;
-                await context.SaveChangesAsync();
+                    await connection.CreateNodeAsync(name);
             }
         }
 
         /// <summary>
-        /// 读取数据(不存在该节点会报错)
+        /// 删除节点
+        /// </summary>
+        /// <param name="fullName"></param>
+        /// <returns></returns>
+        public async Task DeleteNodeAsync(string fullName)
+        {
+            string[] names = fullName.GetChidrenNames();
+            using (var connection = await ConnectRootNodeAsync())
+            {
+                foreach (var name in names.Take(names.Length - 1))
+                    await connection.MoveDownToAsync(name);
+                await connection.DeleteNodeAsync(names[names.Length - 1]);
+            }
+        }
+
+        /// <summary>
+        /// 保存数据
+        /// </summary>
+        /// <param name="fullName"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public async Task SaveDataAsync(string fullName, byte[] value)
+        {
+            string[] names = fullName.GetChidrenNames();
+            using (var connection = await ConnectRootNodeAsync())
+            {
+                foreach (var name in names.Take(names.Length - 1))
+                    await connection.CreateNodeAsync(name);
+                await connection.SaveDataAsync(names[names.Length - 1], value);
+            }
+        }
+
+        /// <summary>
+        /// 读取数据
         /// </summary>
         /// <param name="fullName"></param>
         /// <returns></returns>
         public async Task<byte[]> ReadDataAsync(string fullName)
         {
-            fullName.VerifyFullName();
-            string[] names = fullName.Split(Separator);
-            using (var connection = await ConnectNodeAsync(names[0]))
+            string[] names = fullName.GetChidrenNames();
+            using (var connection = await ConnectRootNodeAsync())
             {
-                foreach (var name in names.Skip(1).Take(names.Length - 2))
+                foreach (var name in names.Take(names.Length - 1))
                     await connection.MoveDownToAsync(name);
                 return await connection.ReadDataAsync(names[names.Length - 1]);
             }
-            //using (var context = new FileFormatContext(FilePath))
-            //{
-            //    string[] names = fullName.Split(Separator);
-            //    var node = await context.FindNodeAsync(names.Take(names.Length - 1));
-            //    string dataName = names[names.Length - 1];
-            //    var data = await context.GetDataAsync(node, dataName);
-            //    if (data == null)
-            //        throw new Exception($"该节点不存在为{dataName}的数据");
-            //    return data.Value;
-            //}
         }
 
-        public async Task DeleteNode(string fullName)
+        public async Task DeleteDataAsync(string fullName)
         {
-
+            string[] names = fullName.GetChidrenNames();
+            using (var connection = await ConnectRootNodeAsync())
+            {
+                foreach (var name in names.Take(names.Length - 1))
+                    await connection.MoveDownToAsync(name);
+                await connection.DeleteDataAsync(names[names.Length - 1]);
+            }
         }
-
-        //public string[] GetChildrenKeys(string key)
-        //{
-        //    using (var context = new FileFormatContext(FilePath))
-        //    {
-        //        return context.Datas.Select(d => d.Key).Where(k => k.StartsWith(key)).ToArray();
-        //    }
-        //}
     }
 }

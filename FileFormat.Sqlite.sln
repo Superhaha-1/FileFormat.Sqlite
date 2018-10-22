@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileFormat.Sqlite.Wpf", "Fi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileFormat.Sqlite.Tests", "FileFormat.Sqlite.Tests\FileFormat.Sqlite.Tests.csproj", "{9EAF0D48-5C56-42DC-96E6-300E3DC5A71A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileFormat.Sqlite.Demo", "FileFormat.Sqlite.Demo\FileFormat.Sqlite.Demo.csproj", "{C639E040-75F4-47BC-B996-76B961BFEA3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9EAF0D48-5C56-42DC-96E6-300E3DC5A71A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EAF0D48-5C56-42DC-96E6-300E3DC5A71A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EAF0D48-5C56-42DC-96E6-300E3DC5A71A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C639E040-75F4-47BC-B996-76B961BFEA3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C639E040-75F4-47BC-B996-76B961BFEA3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C639E040-75F4-47BC-B996-76B961BFEA3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C639E040-75F4-47BC-B996-76B961BFEA3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

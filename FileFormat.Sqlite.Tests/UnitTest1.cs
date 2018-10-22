@@ -7,7 +7,6 @@ namespace FileFormat.Sqlite.Tests
     public class UnitTest1
     {
         [TestMethod]
-        [DeploymentItem("file.db",)]
         public void TestMethod1()
         {
         }

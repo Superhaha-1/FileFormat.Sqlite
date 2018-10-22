@@ -93,16 +93,9 @@ namespace FileFormat.Sqlite.Wpf
 
         private async void Button_Test_Click(object sender, RoutedEventArgs e)
         {
-            var data = await Connection.ReadDataAsync(Key);
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            using (var nodeConnection = await Connection.ConnectNodeAsync("Images.Images"))
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    await nodeConnection.SaveDataAsync(i.ToString(), data);
-                }
-            }
+            await Connection.CreateNodeAsync("Images.Images");
             stopwatch.Stop();
             TextBox_Test.Text = stopwatch.ElapsedMilliseconds.ToString();
         }

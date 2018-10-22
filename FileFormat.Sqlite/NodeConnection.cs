@@ -14,8 +14,14 @@ namespace FileFormat.Sqlite
             Node = node;
         }
 
+        /// <summary>
+        /// 数据库连接
+        /// </summary>
         private FileFormatContext Context { get; }
 
+        /// <summary>
+        /// 当前节点
+        /// </summary>
         private Node Node { get; set; }
 
         #region IDisposable Support
@@ -59,6 +65,11 @@ namespace FileFormat.Sqlite
 
         #endregion
 
+        /// <summary>
+        /// 获取数据(没有返回null)
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private async Task<Data> GetDataAsync(string name)
         {
             name.VerifyName();
@@ -69,6 +80,11 @@ namespace FileFormat.Sqlite
                 .FirstOrDefaultAsync(d => d.Name == name);
         }
 
+        /// <summary>
+        /// 获取节点(没有返回null)
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private async Task<Node> GetNodeAsync(string name)
         {
             name.VerifyName();
@@ -79,6 +95,11 @@ namespace FileFormat.Sqlite
                 .FirstOrDefaultAsync(n => n.Name == name);
         }
 
+        /// <summary>
+        /// 读取数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task<byte[]> ReadDataAsync(string name)
         {
             var data = await GetDataAsync(name);
@@ -87,8 +108,15 @@ namespace FileFormat.Sqlite
             return data.Value;
         }
 
+        /// <summary>
+        /// 保存数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public async Task SaveDataAsync(string name, byte[] value)
         {
+            value.VerifyData();
             var data = await GetDataAsync(name);
             if (data == null)
                 await Context
@@ -99,6 +127,10 @@ namespace FileFormat.Sqlite
             await Context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// 移动至上一个节点
+        /// </summary>
+        /// <returns></returns>
         public async Task<string> MoveUpAsync()
         {
             if (Node.NodeKey == null)
@@ -109,6 +141,11 @@ namespace FileFormat.Sqlite
             return Node.Name;
         }
 
+        /// <summary>
+        /// 移动至指定的节点
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task MoveUpToAsync(string name)
         {
             name.VerifyName();
@@ -118,16 +155,29 @@ namespace FileFormat.Sqlite
             }
         }
 
+        /// <summary>
+        /// 移动至根节点
+        /// </summary>
+        /// <returns></returns>
         public async Task MoveUpToRoot()
         {
             Node = await Context.GetRootNodeAsync();
         }
 
+        /// <summary>
+        /// 往下移动至指定的节点
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task MoveDownToAsync(string name)
         {
             Node = await GetNodeAsync(name) ?? throw new Exception($"不存在名为{name}的Node");
         }
 
+        /// <summary>
+        /// 获取所有子节点的name
+        /// </summary>
+        /// <returns></returns>
         public async Task<string[]> GetChildrenNodeNamesAsync()
         {
             return await Context
@@ -138,6 +188,10 @@ namespace FileFormat.Sqlite
                 .ToArrayAsync();
         }
 
+        /// <summary>
+        /// 获取所有子数据的name
+        /// </summary>
+        /// <returns></returns>
         public async Task<string[]> GetChildrenDataNamesAsync()
         {
             return await Context
@@ -148,6 +202,11 @@ namespace FileFormat.Sqlite
                 .ToArrayAsync();
         }
 
+        /// <summary>
+        /// 删除指定的节点
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task DeleteNodeAsync(string name)
         {
             var node = await GetNodeAsync(name);
@@ -159,6 +218,11 @@ namespace FileFormat.Sqlite
             await Context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// 新建节点并移动到该节点
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task CreateNodeAsync(string name)
         {
             var node = await GetNodeAsync(name);
@@ -167,12 +231,18 @@ namespace FileFormat.Sqlite
                 await Context.Nodes.AddAsync(new Node(name, Node.Key));
                 await Context.SaveChangesAsync();
             }
+            Node = node;
         }
 
+        /// <summary>
+        /// 删除指定的数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task DeleteDataAsync(string name)
         {
             var data = await GetDataAsync(name);
-            if(data==null)
+            if (data == null)
                 throw new Exception($"不存在名为{name}的Data");
             Context
                 .Datas
