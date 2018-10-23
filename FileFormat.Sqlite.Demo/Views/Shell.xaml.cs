@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Reactive.Disposables;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using FileFormat.Sqlite.Demo.ViewModels;
 using ReactiveUI;
+using Splat;
 
 namespace FileFormat.Sqlite.Demo.Views
 {
@@ -29,9 +19,13 @@ namespace FileFormat.Sqlite.Demo.Views
             ViewModel = new ShellViewModel();
             this.WhenActivated(d =>
             {
-                this.OneWayBind(ViewModel, vm => vm.LoadFileCommand, v => v.Button_LoadFile.Command).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.LoadFileCommand, v => v.Button_LoadFile).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.UpCommand, v => v.Button_Up).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.NodeNames, v => v.ListBox_Nodes.ItemsSource).DisposeWith(d);
-                this.Bind(ViewModel, vm => vm.SelectedNodeName, v => v.ListBox_Nodes.SelectedItem).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.SelectedNodeIndex, v => v.ListBox_Nodes.SelectedIndex).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.ItemViewModels, v => v.ListBox_BrowseItem.ItemsSource).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.SelectedItemIndex, v => v.ListBox_BrowseItem.SelectedIndex).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Image, v => v.Image_Local.Source, image => image?.ToNative());
             });
         }
 

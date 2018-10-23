@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FileFormat.Sqlite
 {
@@ -34,6 +35,27 @@ namespace FileFormat.Sqlite
         {
             var context = new FileFormatContext(FilePath);
             return new NodeConnection(context, await context.GetRootNodeAsync());
+        }
+
+        /// <summary>
+        /// 连接至节点
+        /// </summary>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public async Task<NodeConnection> ConnectNodeAsync(IEnumerable<string> names)
+        {
+            var connection = await ConnectRootNodeAsync();
+            try
+            {
+                foreach (var name in names)
+                    await connection.MoveDownToAsync(name);
+                return connection;
+            }
+            catch
+            {
+                connection.Dispose();
+                throw;
+            }
         }
 
         /// <summary>
