@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FileFormat.Sqlite
 {
@@ -144,14 +145,15 @@ namespace FileFormat.Sqlite
         /// <summary>
         /// 移动至指定的节点
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="names"></param>
         /// <returns></returns>
-        public async Task MoveUpToAsync(string name)
+        public async Task MoveToAsync(IEnumerable<string> names)
         {
-            name.VerifyName();
-            while (await MoveUpAsync() != name)
+            await MoveUpToRoot();
+            foreach (var name in names)
             {
-
+                name.VerifyName();
+                await MoveDownToAsync(name);
             }
         }
 

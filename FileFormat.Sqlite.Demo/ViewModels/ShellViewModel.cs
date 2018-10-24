@@ -17,14 +17,17 @@ namespace FileFormat.Sqlite.Demo.ViewModels
     {
         public ShellViewModel()
         {
-            (this).WhenActivated(d =>
+            this.WhenActivated(d =>
             {
                 (LoadFileCommand = ReactiveCommand.Create(LoadFile)).DisposeWith(d);
                 (UpCommand = ReactiveCommand.Create(Up, this.WhenAnyValue(s => s.SelectedNodeIndex).Select(i => i > 0))).DisposeWith(d);
                 NodeNameList.Connect().Bind(out _nodeNames).Subscribe().DisposeWith(d);
                 ItemViewModelList.Connect().Bind(out _itemViewModels).Subscribe().DisposeWith(d);
                 this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).CombineLatest(IsUpdating, (int index, bool isUpdating) => new { index, isUpdating }).Where(x => !x.isUpdating).Select(x => x.index).Select(SelectedNodeIndexChanged).Subscribe().DisposeWith(d);
-                this.WhenAnyValue(s => s.SelectedItemIndex).Skip(1).Subscribe(SelectedItemIndexChanged).DisposeWith(d);
+                this.WhenAnyValue(s => s.SelectedItemIndex).Skip(1).Select(SelectedItemIndexChanged).Subscribe().DisposeWith(d);
+                FilePath.Select(FilePathChanged).Subscribe().DisposeWith(d);
+                (_hasFile = FilePath.Select(f => f != null).ToProperty(this, s => s.HasFile)).DisposeWith(d);
+                IsUpdating.OnNext(false);
             });
         }
 
@@ -37,6 +40,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         private string RootName => "...";
 
         public ReactiveCommand LoadFileCommand { get; set; }
+
+        public ReactiveCommand CreateFileCommand { get; set; }
 
         public ReactiveCommand UpCommand { get; set; }
 
@@ -99,51 +104,45 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             }
         }
 
-        private FileConnection Connection { get; set; }
+        private Subject<string> FilePath { get; } = new Subject<string>();
+
+        private ObservableAsPropertyHelper<bool> _hasFile;
+
+        public bool HasFile => _hasFile.Value;
+
+        private NodeConnection Connection { get; set; }
 
         private void LoadFile()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog() { CheckFileExists = true, Multiselect = false, Filter = "数据文件|*.mrpd" };
             if(openFileDialog.ShowDialog().Value)
             {
-
-                SelectedNodeIndex = -1;
-                Connection = new FileConnection(openFileDialog.FileName);
-                NodeNameList.Edit(list =>
-                {
-                    list.Add(RootName);
-                });
-                SelectedNodeIndex = 0;
-                IsUpdating.OnNext(false);
+                FilePath.OnNext(openFileDialog.FileName);
             }
+        }
+
+        private void CreateFile()
+        {
+            
+        }
+
+        private async Task FilePathChanged(string filePath)
+        {
+            UpdateSelectedNodeIndex(i => -1);
+            Connection?.Dispose();
+            Connection = await new FileConnection(filePath).ConnectRootNodeAsync();
+            NodeNameList.Add(RootName);
+            UpdateSelectedNodeIndex(i => 0);
         }
 
         private async Task SelectedNodeIndexChanged(int index)
         {
             if (index == -1)
             {
-                NodeNameList.Edit(list =>
-                {
-                    list.Clear();
-                });
-                ItemViewModelList.Edit(list =>
-                {
-                    list.Clear();
-                });
+                NodeNameList.Clear();
+                ItemViewModelList.Clear();
                 return;
             }
-            using (var nodeConnection = await Connection.ConnectNodeAsync(NodeNameList.Items.Skip(1).Take(index)))
-            {
-                ItemViewModelList.Edit(async list =>
-                {
-                    list.Clear();
-                    foreach (var nodeName in await nodeConnection.GetChildrenNodeNamesAsync())
-                        list.Add(new NodeItemViewModel(nodeName));
-                    foreach (var dataName in await nodeConnection.GetChildrenDataNamesAsync())
-                        list.Add(new DataItemViewModel(dataName));
-                });
-            }
-            SelectedItemIndex = -1;
 
             int lastIndex = NodeNameList.Count - 1;
             if (index < lastIndex)
@@ -154,38 +153,52 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                         list.RemoveAt(i);
                 });
             }
+
+            await Connection.MoveToAsync(NodeNameList.Items.Skip(1));
+            ItemViewModelList.Edit(async list =>
+            {
+                list.Clear();
+                foreach (var nodeName in await Connection.GetChildrenNodeNamesAsync())
+                    list.Add(new NodeItemViewModel(nodeName));
+                foreach (var dataName in await Connection.GetChildrenDataNamesAsync())
+                    list.Add(new DataItemViewModel(dataName));
+            });
         }
 
-        private async void SelectedItemIndexChanged(int index)
+        private async Task SelectedItemIndexChanged(int index)
         {
             if (index == -1)
+            {
+                Image?.Dispose();
+                Image = null;
                 return;
+            }
             var selectedItem = ItemViewModelList.Items.ElementAt(index);
             if (selectedItem is NodeItemViewModel)
             {
                 NodeNameList.Add(selectedItem.Name);
-                SelectedNodeIndex++;
-                Image?.Dispose();
-                Image = null;
+                UpdateSelectedNodeIndex(i => i + 1);
             }
             else
             {
-                using (var nodeConnection = await Connection.ConnectNodeAsync(NodeNameList.Items.Skip(1)))
+                using (var stream = new MemoryStream(await Connection.ReadDataAsync(selectedItem.Name)))
                 {
-                    using (var stream = new MemoryStream(await nodeConnection.ReadDataAsync(selectedItem.Name)))
-                    {
-                        Image?.Dispose();
-                        Image = await BitmapLoader.Current.Load(stream, null, null);
-                    }
+                    Image?.Dispose();
+                    Image = await BitmapLoader.Current.Load(stream, null, null);
                 }
             }
         }
 
-        private void Up()
+        private void UpdateSelectedNodeIndex(Func<int, int> updateAction)
         {
             IsUpdating.OnNext(true);
-            SelectedNodeIndex--;
+            SelectedNodeIndex = updateAction.Invoke(SelectedNodeIndex);
             IsUpdating.OnNext(false);
+        }
+
+        private void Up()
+        {
+            UpdateSelectedNodeIndex(i => i - 1);
         }
     }
 }
