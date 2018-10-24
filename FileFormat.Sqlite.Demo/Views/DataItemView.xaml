@@ -20,6 +20,6 @@
             </ContextMenu>
         </Grid.ContextMenu>
         <Frame Source="../Images/Document_24x.xaml" Grid.Column="0"/>
-        <TextBlock x:Name="TextBlock_Name" Grid.Column="1"/>
+        <TextBlock x:Name="TextBlock_Name" Grid.Column="1" VerticalAlignment="Center"/>
     </Grid>
 </reactiveui:ReactiveUserControl>

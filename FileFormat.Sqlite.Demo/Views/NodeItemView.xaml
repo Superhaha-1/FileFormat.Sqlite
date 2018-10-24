@@ -11,6 +11,6 @@
                                 d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Orientation="Horizontal" Background="Transparent">
         <Frame Source="../Images/Folder_24x.xaml"/>
-        <TextBlock x:Name="TextBlock_Name"/>
+        <TextBlock x:Name="TextBlock_Name" VerticalAlignment="Center"/>
     </StackPanel>
 </reactiveui:ReactiveUserControl>
