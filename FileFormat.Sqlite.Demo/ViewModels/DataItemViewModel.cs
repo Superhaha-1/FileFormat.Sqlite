@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reactive.Disposables;
+using FileFormat.Sqlite.Demo.Interfaces;
+using ReactiveUI;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
     public sealed class DataItemViewModel : ItemViewModelBase
     {
-        public DataItemViewModel(string name) : base(name)
+        public DataItemViewModel(string name, IDataManager dataManager) : base(name)
         {
+            this.WhenActivated(d=>
+            {
+                (DeleteCommand = ReactiveCommand.Create(() => dataManager.DeleteData(name))).DisposeWith(d);
+            });
         }
+
+        public ReactiveCommand DeleteCommand { get; set; }
     }
 }

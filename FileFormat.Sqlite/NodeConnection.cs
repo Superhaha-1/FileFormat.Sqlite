@@ -74,8 +74,7 @@ namespace FileFormat.Sqlite
         private async Task<Data> GetDataAsync(string name)
         {
             name.VerifyName();
-            return await Context
-                .Entry(Node)
+            return await Context.Entry(Node)
                 .Collection(n => n.ChildrenDatas)
                 .Query()
                 .FirstOrDefaultAsync(d => d.Name == name);
@@ -89,8 +88,7 @@ namespace FileFormat.Sqlite
         private async Task<Node> GetNodeAsync(string name)
         {
             name.VerifyName();
-            return await Context
-                .Entry(Node)
+            return await Context.Entry(Node)
                 .Collection(n => n.ChildrenNodes)
                 .Query()
                 .FirstOrDefaultAsync(n => n.Name == name);
@@ -120,8 +118,7 @@ namespace FileFormat.Sqlite
             value.VerifyData();
             var data = await GetDataAsync(name);
             if (data == null)
-                await Context
-                    .Datas
+                await Context.Datas
                     .AddAsync(new Data(name, value, Node.Key));
             else
                 data.Value = value;
@@ -136,8 +133,7 @@ namespace FileFormat.Sqlite
         {
             if (Node.NodeKey == null)
                 throw new Exception("已经是根节点了");
-            Node = await Context
-                .Nodes
+            Node = await Context.Nodes
                 .FindAsync(Node.NodeKey.Value);
             return Node.Name;
         }
@@ -182,8 +178,7 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         public async Task<string[]> GetChildrenNodeNamesAsync()
         {
-            return await Context
-                .Entry(Node)
+            return await Context.Entry(Node)
                 .Collection(n => n.ChildrenNodes)
                 .Query()
                 .Select(n => n.Name)
@@ -196,8 +191,7 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         public async Task<string[]> GetChildrenDataNamesAsync()
         {
-            return await Context
-                .Entry(Node)
+            return await Context.Entry(Node)
                 .Collection(n => n.ChildrenDatas)
                 .Query()
                 .Select(d => d.Name)
@@ -214,26 +208,28 @@ namespace FileFormat.Sqlite
             var node = await GetNodeAsync(name);
             if (node == null)
                 throw new Exception($"不存在名为{name}的Node");
-            Context
-                .Nodes
+            Context.Nodes
                 .Remove(node);
             await Context.SaveChangesAsync();
         }
 
         /// <summary>
-        /// 新建节点并移动到该节点
+        /// 新建节点
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="isMove">是否移动至该节点</param>
         /// <returns></returns>
-        public async Task CreateNodeAsync(string name)
+        public async Task CreateNodeAsync(string name, bool isMove = true)
         {
             var node = await GetNodeAsync(name);
             if (node == null)
             {
-                await Context.Nodes.AddAsync(new Node(name, Node.Key));
+                await Context.Nodes
+                    .AddAsync(new Node(name, Node.Key));
                 await Context.SaveChangesAsync();
             }
-            Node = node;
+            if (isMove)
+                Node = node;
         }
 
         /// <summary>
@@ -246,8 +242,7 @@ namespace FileFormat.Sqlite
             var data = await GetDataAsync(name);
             if (data == null)
                 throw new Exception($"不存在名为{name}的Data");
-            Context
-                .Datas
+            Context.Datas
                 .Remove(data);
             await Context.SaveChangesAsync();
         }

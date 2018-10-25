@@ -32,6 +32,11 @@
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource MahApps.Metro.Styles.MetroCircleButtonStyle}">
                             <Setter Property="BorderBrush" Value="{DynamicResource GrayBrush7}"/>
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <iconPacks:PackIconMaterial Kind="ArrowUp"/>
+                                </Setter.Value>
+                            </Setter>
                             <Style.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}"/>
@@ -39,9 +44,6 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <Button.Content>
-                        <iconPacks:PackIconMaterial Kind="ArrowUp" Foreground="{DynamicResource AccentColorBrush}" Width="16" Height="16"/>
-                    </Button.Content>
                 </Button>
                 <ListBox x:Name="ListBox_Nodes" BorderThickness="0">
                     <ListBox.ItemsPanel>
@@ -56,12 +58,11 @@
                                     <ControlTemplate TargetType="ListBoxItem">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock x:Name="TextBlock_NodeName" Text="{Binding}" VerticalAlignment="Center" FontSize="18"/>
-                                            <TextBlock Text=">" IsHitTestVisible="False" VerticalAlignment="Center" FontSize="18"/>
+                                            <iconPacks:PackIconMaterialLight Kind="ChevronRight" VerticalAlignment="Center" Foreground="{StaticResource Brushes.Icon.Foreground}"/>
                                         </StackPanel>
                                         <ControlTemplate.Triggers>
                                             <Trigger SourceName="TextBlock_NodeName" Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="TextBlock_NodeName" Property="Background" Value="Blue"/>
-                                                <Setter TargetName="TextBlock_NodeName" Property="Foreground" Value="Red"/>
+                                                <Setter TargetName="TextBlock_NodeName" Property="Background" Value="{DynamicResource AccentColorBrush}"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -71,7 +72,13 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </StackPanel>
-            <ListBox x:Name="ListBox_BrowseItem" Grid.Row="1" Grid.Column="0" Margin="5" HorizontalContentAlignment="Stretch"/>
+            <ListBox x:Name="ListBox_BrowseItem" Grid.Row="1" Grid.Column="0" Margin="5" HorizontalContentAlignment="Stretch">
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="MenuItem_CreateNode" Header="新建节点"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
             <Image x:Name="Image_Local" Grid.Row="1" Grid.Column="1" Margin="5"/>
         </Grid>
     </Grid>

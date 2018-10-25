@@ -211,18 +211,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Images\Document_24x.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Images\Folder_24x.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Images\Upload_16x.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\DataItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -239,6 +227,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Interfaces\IDataManager.cs" />
+    <Compile Include="Interfaces\INodeManager.cs" />
     <Compile Include="ViewModels\DataItemViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModelBase.cs" />
     <Compile Include="ViewModels\NodeItemViewModel.cs" />

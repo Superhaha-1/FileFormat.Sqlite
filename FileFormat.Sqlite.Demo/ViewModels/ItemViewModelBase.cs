@@ -7,12 +7,20 @@ using ReactiveUI;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
-    public abstract class ItemViewModelBase : ReactiveObject
+    public abstract class ItemViewModelBase : ReactiveObject, ISupportsActivation
     {
+        public static ItemViewModelBase Empty { get; } = null;
+
         protected ItemViewModelBase(string name)
         {
             Name = name;
         }
+
+        #region 实现ISupportsActivation
+
+        ViewModelActivator ISupportsActivation.Activator { get; } = new ViewModelActivator();
+
+        #endregion
 
         public string Name { get; }
     }

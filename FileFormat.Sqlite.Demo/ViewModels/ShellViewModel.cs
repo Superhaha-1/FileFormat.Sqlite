@@ -6,14 +6,14 @@ using System.Reactive.Linq;
 using System;
 using System.Linq;
 using DynamicData;
-using System.Threading.Tasks;
 using System.Reactive.Subjects;
 using Splat;
 using System.IO;
+using FileFormat.Sqlite.Demo.Interfaces;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
-    public sealed class ShellViewModel : ReactiveObject, ISupportsActivation
+    public sealed class ShellViewModel : ReactiveObject, ISupportsActivation, INodeManager, IDataManager
     {
         public ShellViewModel()
         {
@@ -21,11 +21,12 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             {
                 (LoadFileCommand = ReactiveCommand.Create(LoadFile)).DisposeWith(d);
                 (UpCommand = ReactiveCommand.Create(Up, this.WhenAnyValue(s => s.SelectedNodeIndex).Select(i => i > 0))).DisposeWith(d);
+                (CreateNodeCommand = ReactiveCommand.Create(CreateNode)).DisposeWith(d);
                 NodeNameList.Connect().Bind(out _nodeNames).Subscribe().DisposeWith(d);
                 ItemViewModelList.Connect().Bind(out _itemViewModels).Subscribe().DisposeWith(d);
-                this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).CombineLatest(IsUpdating, (int index, bool isUpdating) => new { index, isUpdating }).Where(x => !x.isUpdating).Select(x => x.index).Select(SelectedNodeIndexChanged).Subscribe().DisposeWith(d);
-                this.WhenAnyValue(s => s.SelectedItemIndex).Skip(1).Select(SelectedItemIndexChanged).Subscribe().DisposeWith(d);
-                FilePath.Select(FilePathChanged).Subscribe().DisposeWith(d);
+                this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).CombineLatest(IsUpdating, (int index, bool isUpdating) => new { index, isUpdating }).Where(x => !x.isUpdating).Select(x => x.index).Subscribe(SelectedNodeIndexChanged).DisposeWith(d);
+                this.WhenAnyValue(s => s.SelectedItemIndex).Skip(1).Subscribe(SelectedItemIndexChanged).DisposeWith(d);
+                FilePath.Subscribe(FilePathChanged).DisposeWith(d);
                 (_hasFile = FilePath.Select(f => f != null).ToProperty(this, s => s.HasFile)).DisposeWith(d);
                 IsUpdating.OnNext(false);
             });
@@ -37,6 +38,32 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #endregion
 
+        #region 实现INodeManager
+
+        async void INodeManager.DeleteNode(string name)
+        {
+            await Connection.DeleteNodeAsync(name);
+            ItemViewModelList.RemoveAt(ItemViewModelList.Items.Select((item, index) => new { item, index }).First(x => x.item.Name == name && x.item is NodeItemViewModel).index);
+        }
+
+        void INodeManager.EnterNode(string name)
+        {
+            NodeNameList.Add(name);
+            UpdateSelectedNodeIndex(i => i + 1);
+        }
+
+        #endregion
+
+        #region 实现IDataManager
+
+        async void IDataManager.DeleteData(string name)
+        {
+            await Connection.DeleteDataAsync(name);
+            ItemViewModelList.RemoveAt(ItemViewModelList.Items.Select((item, index) => new { item, index }).First(x => x.item.Name == name && x.item is DataItemViewModel).index);
+        }
+
+        #endregion
+
         private string RootName => "...";
 
         public ReactiveCommand LoadFileCommand { get; set; }
@@ -44,6 +71,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         public ReactiveCommand CreateFileCommand { get; set; }
 
         public ReactiveCommand UpCommand { get; set; }
+
+        public ReactiveCommand CreateNodeCommand { get; set; }
 
         private SourceList<string> NodeNameList { get; } = new SourceList<string>();
 
@@ -126,7 +155,26 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             
         }
 
-        private async Task FilePathChanged(string filePath)
+        private async void CreateNode()
+        {
+            string newName = "NewNode";
+            char separator = '_';
+            string nodeName = $"{newName}{separator}1";
+            ItemViewModelList.Insert(ItemViewModelList.Items.Select((item, index) => new { item, index }).Where(x => x.item is NodeItemViewModel).FirstOrDefault(x =>
+            {
+                if (string.Compare(x.item.Name, nodeName) < 0)
+                    return false;
+                if(x.item.Name == nodeName)
+                {
+                    nodeName = $"{newName}{separator}{int.Parse(nodeName.Split(separator)[1]) + 1}";
+                    return false;
+                }
+                return true;
+            })?.index ?? ItemViewModelList.Count, new NodeItemViewModel(nodeName, this));
+            await Connection.CreateNodeAsync(nodeName, false);
+        }
+
+        private async void FilePathChanged(string filePath)
         {
             UpdateSelectedNodeIndex(i => -1);
             Connection?.Dispose();
@@ -135,7 +183,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             UpdateSelectedNodeIndex(i => 0);
         }
 
-        private async Task SelectedNodeIndexChanged(int index)
+        private async void SelectedNodeIndexChanged(int index)
         {
             if (index == -1)
             {
@@ -158,14 +206,14 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             ItemViewModelList.Edit(async list =>
             {
                 list.Clear();
-                foreach (var nodeName in await Connection.GetChildrenNodeNamesAsync())
-                    list.Add(new NodeItemViewModel(nodeName));
-                foreach (var dataName in await Connection.GetChildrenDataNamesAsync())
-                    list.Add(new DataItemViewModel(dataName));
+                foreach (var nodeName in (await Connection.GetChildrenNodeNamesAsync()).OrderBy(n => n))
+                    list.Add(new NodeItemViewModel(nodeName, this));
+                foreach (var dataName in (await Connection.GetChildrenDataNamesAsync()).OrderBy(n => n))
+                    list.Add(new DataItemViewModel(dataName, this));
             });
         }
 
-        private async Task SelectedItemIndexChanged(int index)
+        private async void SelectedItemIndexChanged(int index)
         {
             if (index == -1)
             {
@@ -176,8 +224,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             var selectedItem = ItemViewModelList.Items.ElementAt(index);
             if (selectedItem is NodeItemViewModel)
             {
-                NodeNameList.Add(selectedItem.Name);
-                UpdateSelectedNodeIndex(i => i + 1);
+                Image?.Dispose();
+                Image = null;
             }
             else
             {
