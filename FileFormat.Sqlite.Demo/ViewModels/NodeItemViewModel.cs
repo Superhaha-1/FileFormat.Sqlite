@@ -1,6 +1,5 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Windows.Input;
 using FileFormat.Sqlite.Demo.Interfaces;
-using ReactiveUI;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
@@ -8,33 +7,15 @@ namespace FileFormat.Sqlite.Demo.ViewModels
     {
         public NodeItemViewModel(string name, INodeManager nodeManager) : base(name)
         {
-            this.WhenActivated(d =>
-            {
-                (EnterCommand = ReactiveCommand.Create(() => nodeManager.EnterNode(name))).DisposeWith(d);
-                (RenameCommand = ReactiveCommand.Create(() => IsRenaming = true)).DisposeWith(d);
-                (DeleteCommand = ReactiveCommand.Create(() => nodeManager.DeleteNode(name))).DisposeWith(d);
-            });
+            DeleteCommand = nodeManager.DeleteNodeCommand;
+            EnterCommand = nodeManager.EnterNodeCommand;
+            RenameNodeCommand = nodeManager.StartRenameNodeCommand;
         }
 
-        public ReactiveCommand EnterCommand { get; set; }
+        public ICommand DeleteCommand { get; }
 
-        public ReactiveCommand RenameCommand { get; set; }
+        public ICommand EnterCommand { get; }
 
-        public ReactiveCommand DeleteCommand { get; set; }
-
-        private bool _isRenaming;
-
-        public bool IsRenaming
-        {
-            get
-            {
-                return _isRenaming;
-            }
-
-            private set
-            {
-                this.RaiseAndSetIfChanged(ref _isRenaming, value);
-            }
-        }
+        public ICommand RenameNodeCommand { get; }
     }
 }

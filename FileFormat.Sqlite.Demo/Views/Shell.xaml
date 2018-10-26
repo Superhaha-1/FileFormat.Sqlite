@@ -23,11 +23,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5">
                 <Button Width="24" Height="24" x:Name="Button_Up" Margin="5">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource MahApps.Metro.Styles.MetroCircleButtonStyle}">
@@ -45,7 +41,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <ListBox x:Name="ListBox_Nodes" BorderThickness="0">
+                <ListBox x:Name="ListBox_Nodes">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel Orientation="Horizontal"/>
@@ -72,14 +68,13 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </StackPanel>
-            <ListBox x:Name="ListBox_BrowseItem" Grid.Row="1" Grid.Column="0" Margin="5" HorizontalContentAlignment="Stretch">
+            <ListBox x:Name="ListBox_BrowseItem" Grid.Row="1" Margin="5" HorizontalContentAlignment="Stretch" BorderThickness="1">
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem x:Name="MenuItem_CreateNode" Header="新建节点"/>
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
-            <Image x:Name="Image_Local" Grid.Row="1" Grid.Column="1" Margin="5"/>
         </Grid>
     </Grid>
 </controls:MetroWindow>

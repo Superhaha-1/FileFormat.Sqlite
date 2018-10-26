@@ -199,6 +199,21 @@ namespace FileFormat.Sqlite
         }
 
         /// <summary>
+        /// 重命名指定的节点
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="newName"></param>
+        /// <returns></returns>
+        public async Task RenameNodeAsync(string name, string newName)
+        {
+            var node = await GetNodeAsync(name);
+            if (node == null)
+                throw new Exception($"不存在名为{name}的Node");
+            node.Name = newName;
+            await Context.SaveChangesAsync();
+        }
+
+        /// <summary>
         /// 删除指定的节点
         /// </summary>
         /// <param name="name"></param>

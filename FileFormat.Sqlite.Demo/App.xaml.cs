@@ -15,6 +15,7 @@ namespace FileFormat.Sqlite.Demo
         {
             base.OnStartup(e);
             Locator.CurrentMutable.Register(() => new NodeItemView(), typeof(IViewFor<NodeItemViewModel>));
+            Locator.CurrentMutable.Register(() => new RenamingNodeItemView(), typeof(IViewFor<RenamingNodeItemViewModel>));
             Locator.CurrentMutable.Register(() => new DataItemView(), typeof(IViewFor<DataItemViewModel>));
         }
     }

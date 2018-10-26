@@ -219,6 +219,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\RenamingNodeItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Shell.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -232,12 +236,16 @@
     <Compile Include="ViewModels\DataItemViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModelBase.cs" />
     <Compile Include="ViewModels\NodeItemViewModel.cs" />
+    <Compile Include="ViewModels\RenamingNodeItemViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="Views\DataItemView.xaml.cs">
       <DependentUpon>DataItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\NodeItemView.xaml.cs">
       <DependentUpon>NodeItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RenamingNodeItemView.xaml.cs">
+      <DependentUpon>RenamingNodeItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>

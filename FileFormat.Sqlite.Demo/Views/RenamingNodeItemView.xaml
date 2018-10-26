@@ -1,0 +1,17 @@
+﻿<Grid x:Class="FileFormat.Sqlite.Demo.Views.RenamingNodeItemView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" x:Name="Grid_Main" Focusable="True">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+    <iconPacks:PackIconModern Kind="Folder" Grid.Column="0" Foreground="{StaticResource Brushes.Icon.Folder}" Width="24" Height="24" Margin="3"/>
+    <TextBox x:Name="TextBox_Name" VerticalAlignment="Center" Grid.Column="1" FontSize="12" controls:TextBoxHelper.SelectAllOnFocus="True">
+        <TextBox.InputBindings>
+            <KeyBinding x:Name="KeyBinding_Enter" Key="Enter"/>
+        </TextBox.InputBindings>
+    </TextBox>
+</Grid>

@@ -1,6 +1,4 @@
-﻿using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+﻿using System.Reactive.Disposables;
 using System.Windows;
 using FileFormat.Sqlite.Demo.ViewModels;
 using ReactiveUI;
@@ -17,11 +15,10 @@ namespace FileFormat.Sqlite.Demo.Views
             InitializeComponent();
             this.WhenActivated(d =>
             {
-                this.BindCommand(ViewModel, vm => vm.EnterCommand, v => v.UserControl_Main, nameof(MouseDoubleClick)).DisposeWith(d);
-                this.BindCommand(ViewModel, vm => vm.RenameCommand, v => v.MenuItem_Rename).DisposeWith(d);
-                this.BindCommand(ViewModel, vm => vm.DeleteCommand, v => v.MenuItem_Delete).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.EnterCommand, v => v.ContentControl_Main, vm => vm.Name, nameof(MouseDoubleClick)).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.RenameNodeCommand, v => v.MenuItem_Rename, vm => vm.Name).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.DeleteCommand, v => v.MenuItem_Delete, vm => vm.Name).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Name, v => v.TextBlock_Name.Text).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.IsRenaming, v => v.TextBox_Rename.Visibility).DisposeWith(d);
             });
         }
 

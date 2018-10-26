@@ -1,7 +1,9 @@
-﻿namespace FileFormat.Sqlite.Demo.Interfaces
+﻿using System.Windows.Input;
+
+namespace FileFormat.Sqlite.Demo.Interfaces
 {
     public interface IDataManager
     {
-        void DeleteData(string name);
+        ICommand DeleteDataCommand { get; }
     }
 }

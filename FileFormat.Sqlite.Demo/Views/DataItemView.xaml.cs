@@ -16,7 +16,7 @@ namespace FileFormat.Sqlite.Demo.Views
             this.WhenActivated(d =>
             {
                 this.OneWayBind(ViewModel, vm => vm.Name, v => v.TextBlock_Name.Text).DisposeWith(d);
-                this.BindCommand(ViewModel, vm => vm.DeleteCommand, v => v.MenuItem_Delete).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.DeleteCommand, v => v.MenuItem_Delete, vm=>vm.Name).DisposeWith(d);
             });
         }
 

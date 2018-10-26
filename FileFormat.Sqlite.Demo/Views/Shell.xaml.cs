@@ -25,7 +25,6 @@ namespace FileFormat.Sqlite.Demo.Views
                 this.Bind(ViewModel, vm => vm.SelectedNodeIndex, v => v.ListBox_Nodes.SelectedIndex).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.ItemViewModels, v => v.ListBox_BrowseItem.ItemsSource).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.SelectedItemIndex, v => v.ListBox_BrowseItem.SelectedIndex).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.Image, v => v.Image_Local.Source, image => image?.ToNative());
             });
         }
 

@@ -1,7 +1,7 @@
 ﻿<Grid x:Class="FileFormat.Sqlite.Demo.Views.DataItemView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" Background="Transparent">
     <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition/>
@@ -13,5 +13,5 @@
         </ContextMenu>
     </Grid.ContextMenu>
     <iconPacks:PackIconMaterial Kind="File" Grid.Column="0" Width="24" Height="24" Margin="3" Foreground="{StaticResource Brushes.Icon.Foreground}"/>
-    <TextBlock x:Name="TextBlock_Name" Grid.Column="1" VerticalAlignment="Center" FontSize="16"/>
+    <TextBlock x:Name="TextBlock_Name" Grid.Column="1" VerticalAlignment="Center" FontSize="12"/>
 </Grid>
