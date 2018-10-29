@@ -27,7 +27,7 @@
                 <Button Width="24" Height="24" x:Name="Button_Up" Margin="5">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource MahApps.Metro.Styles.MetroCircleButtonStyle}">
-                            <Setter Property="BorderBrush" Value="{DynamicResource GrayBrush7}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource GrayBrush3}"/>
                             <Setter Property="Content">
                                 <Setter.Value>
                                     <iconPacks:PackIconMaterial Kind="ArrowUp"/>
@@ -68,7 +68,7 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </StackPanel>
-            <ListBox x:Name="ListBox_BrowseItem" Grid.Row="1" Margin="5" HorizontalContentAlignment="Stretch" BorderThickness="1">
+            <ListBox x:Name="ListBox_BrowseItem" Grid.Row="1" Margin="5" BorderThickness="1" Style="{DynamicResource VirtualisedMetroListBox}">
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem x:Name="MenuItem_CreateNode" Header="新建节点"/>

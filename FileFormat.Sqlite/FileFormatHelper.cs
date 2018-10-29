@@ -1,13 +1,14 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 
 namespace FileFormat.Sqlite
 {
-    internal static class FileFormatHelper
+    public static class FileFormatHelper
     {
         private static char Separator => '.';
 
-        public static string[] GetChidrenNames(this string fullName)
+        internal static string[] GetChidrenNames(this string fullName)
         {
             if (string.IsNullOrEmpty(fullName))
                 throw new Exception("FullName为空");
@@ -15,7 +16,7 @@ namespace FileFormat.Sqlite
             return names;
         }
 
-        public static void VerifyName(this string name)
+        internal static void VerifyName(this string name)
         {
             if (string.IsNullOrEmpty(name))
                 throw new Exception("Name为空");
@@ -23,10 +24,22 @@ namespace FileFormat.Sqlite
                 throw new Exception("Name中有空字符");
         }
 
-        public static void VerifyData(this byte[] data)
+        internal static void VerifyData(this byte[] data)
         {
             if (data == null)
                 throw new Exception("数据不能为空");
+        }
+
+        private static char[] InvalidPathChars { get; } = Path.GetInvalidPathChars().Intersect(new char[] { Separator }).ToArray();
+
+        public static (bool isValid, string describe) IsValidName(this string name)
+        {
+            foreach(var c in InvalidPathChars)
+            {
+                if (name.Contains(c))
+                    return (false, $"名称中不能包含{c}");
+            }
+            return (true, null);
         }
     }
 }

@@ -10,10 +10,11 @@ using System.Reactive.Subjects;
 using FileFormat.Sqlite.Demo.Interfaces;
 using System.Windows.Input;
 using DynamicData.Binding;
+using System.IO;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
-    public sealed class ShellViewModel : ReactiveObject, ISupportsActivation, INodeManager, IDataManager
+    public sealed class ShellViewModel : ReactiveObject, ISupportsActivation, INodeManager, IDataManager, ISupportsValidation
     {
         public ShellViewModel()
         {
@@ -44,6 +45,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #region 实现INodeManager
 
+        #region DeleteNodeCommand
+
         private ReactiveCommand _deleteNodeCommand;
 
         ICommand INodeManager.DeleteNodeCommand => _deleteNodeCommand;
@@ -53,6 +56,10 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             await Connection.DeleteNodeAsync(name);
             NodeItemViewModelCache.RemoveKey(name);
         }
+
+        #endregion
+
+        #region EnterNodeCommand
 
         private ReactiveCommand _enterNodeCommand;
 
@@ -64,9 +71,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             UpdateSelectedNodeIndex(i => i + 1);
         }
 
-        private ReactiveCommand _startRenameNodeCommand;
-
-        ICommand INodeManager.StartRenameNodeCommand => _startRenameNodeCommand;
+        #endregion
 
         private void UpdateNodeCache(Action<ISourceUpdater<ItemViewModelBase, string>> updateAction)
         {
@@ -75,10 +80,20 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             SelectedItemIndex = selectedItemIndex;
         }
 
+        #region StartRenameNodeCommand
+
+        private ReactiveCommand _startRenameNodeCommand;
+
+        ICommand INodeManager.StartRenameNodeCommand => _startRenameNodeCommand;
+
         private void StartRenameNode(string name)
         {
             UpdateNodeCache(cache => cache.AddOrUpdate(new RenamingNodeItemViewModel(name, this)));
         }
+
+        #endregion
+
+        #region EndRenameNodeCommand
 
         private ReactiveCommand _endRenameNodeCommand;
 
@@ -108,7 +123,11 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #endregion
 
+        #endregion
+
         #region 实现IDataManager
+
+        #region DeleteDataCommand
 
         private ReactiveCommand _deleteDataCommand;
 
@@ -122,6 +141,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #endregion
 
+        #endregion
+
         private string RootName => "...";
 
         public ReactiveCommand LoadFileCommand { get; set; }
@@ -130,7 +151,28 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         public ReactiveCommand UpCommand { get; set; }
 
+        #region CreateNodeCommand
+
         public ReactiveCommand CreateNodeCommand { get; set; }
+
+        private async void CreateNode()
+        {
+            string newName = "NewNode_";
+            string name = null;
+            var names = NodeItemViewModelCache.Keys.Where(k => k.StartsWith(newName)).ToArray();
+            for (int i = 1; true; i++)
+            {
+                name = $"{newName}{i}";
+                if (!names.Contains(name))
+                    break;
+            }
+            await Connection.CreateNodeAsync(name, false);
+            var newNode = new NodeItemViewModel(name, this);
+            NodeItemViewModelCache.AddOrUpdate(newNode);
+            SelectedItemIndex = ItemViewModels.IndexOf(newNode);
+        }
+
+        #endregion
 
         private SourceList<string> NodeNameList { get; } = new SourceList<string>();
 
@@ -198,21 +240,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         private void CreateFile()
         {
             
-        }
-
-        private async void CreateNode()
-        {
-            string newName = "NewNode_";
-            string name = null;
-            var names = NodeItemViewModelCache.Keys.Where(k => k.StartsWith(newName)).ToArray();
-            for (int i = 1; true; i++)
-            {
-                name = $"{newName}{i}";
-                if (!names.Contains(name))
-                    break;
-            }
-            await Connection.CreateNodeAsync(name, false);
-            NodeItemViewModelCache.AddOrUpdate(new NodeItemViewModel(name, this));
         }
 
         private async void FilePathChanged(string filePath)
