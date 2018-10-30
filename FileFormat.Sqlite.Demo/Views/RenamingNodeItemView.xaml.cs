@@ -2,6 +2,7 @@
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows;
 
 namespace FileFormat.Sqlite.Demo.Views
@@ -18,7 +19,8 @@ namespace FileFormat.Sqlite.Demo.Views
             {
                 ((KeyBinding_Enter.Command = ReactiveCommand.Create(() => Grid_Main.Focus())) as IDisposable).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.NewName, v => v.TextBox_Name.Text).DisposeWith(d);
-                this.BindCommand(ViewModel, vm => vm.RenameCommand, v => v.TextBox_Name, ViewModel.ChangedNameObservable, nameof(LostFocus)).DisposeWith(d);
+                //TextBox_Name.Events().LostKeyboardFocus.Select(e =>(ViewModel.Name,ViewModel.NewName)).InvokeCommand(this, v => v.ViewModel.RenameCommand).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.RenameCommand, v => v.TextBox_Name, ViewModel.ChangedName, nameof(TextBox_Name.LostKeyboardFocus)).DisposeWith(d);
                 TextBox_Name.Focus();
             });
         }

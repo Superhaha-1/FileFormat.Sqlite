@@ -73,7 +73,7 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         private async Task<Data> GetDataAsync(string name)
         {
-            name.VerifyName();
+            name.ValidateName();
             return await Context.Entry(Node)
                 .Collection(n => n.ChildrenDatas)
                 .Query()
@@ -87,7 +87,7 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         private async Task<Node> GetNodeAsync(string name)
         {
-            name.VerifyName();
+            name.ValidateName();
             return await Context.Entry(Node)
                 .Collection(n => n.ChildrenNodes)
                 .Query()
@@ -115,7 +115,7 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         public async Task SaveDataAsync(string name, byte[] value)
         {
-            value.VerifyData();
+            value.ValidateData();
             var data = await GetDataAsync(name);
             if (data == null)
                 await Context.Datas
@@ -148,7 +148,7 @@ namespace FileFormat.Sqlite
             await MoveUpToRoot();
             foreach (var name in names)
             {
-                name.VerifyName();
+                name.ValidateName();
                 await MoveDownToAsync(name);
             }
         }
@@ -206,6 +206,7 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         public async Task RenameNodeAsync(string name, string newName)
         {
+            newName.ValidateName();
             var node = await GetNodeAsync(name);
             if (node == null)
                 throw new Exception($"不存在名为{name}的Node");

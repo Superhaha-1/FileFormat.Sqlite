@@ -16,7 +16,7 @@ namespace FileFormat.Sqlite
             return names;
         }
 
-        internal static void VerifyName(this string name)
+        internal static void ValidateName(this string name)
         {
             if (string.IsNullOrEmpty(name))
                 throw new Exception("Name为空");
@@ -24,7 +24,7 @@ namespace FileFormat.Sqlite
                 throw new Exception("Name中有空字符");
         }
 
-        internal static void VerifyData(this byte[] data)
+        internal static void ValidateData(this byte[] data)
         {
             if (data == null)
                 throw new Exception("数据不能为空");

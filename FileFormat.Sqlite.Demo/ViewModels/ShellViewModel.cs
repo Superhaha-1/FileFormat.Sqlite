@@ -10,16 +10,17 @@ using System.Reactive.Subjects;
 using FileFormat.Sqlite.Demo.Interfaces;
 using System.Windows.Input;
 using DynamicData.Binding;
-using System.IO;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
-    public sealed class ShellViewModel : ReactiveObject, ISupportsActivation, INodeManager, IDataManager, ISupportsValidation
+    public sealed class ShellViewModel : ReactiveObject, ISupportsActivation, INodeManager, IDataManager
     {
         public ShellViewModel()
         {
             this.WhenActivated(d =>
             {
+                (IsUpdating = new Subject<bool>()).DisposeWith(d);
+                (FilePath = new Subject<string>()).DisposeWith(d);
                 (LoadFileCommand = ReactiveCommand.Create(LoadFile)).DisposeWith(d);
                 (UpCommand = ReactiveCommand.Create(Up, this.WhenAnyValue(s => s.SelectedNodeIndex).Select(i => i > 0))).DisposeWith(d);
                 (CreateNodeCommand = ReactiveCommand.Create(CreateNode)).DisposeWith(d);
@@ -117,8 +118,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 cache.RemoveKey(oldName);
                 cache.AddOrUpdate(item);
             });
-            SelectedItemIndex = ItemViewModels.IndexOf(item);
             await Connection.RenameNodeAsync(oldName, newName);
+            SelectedItemIndex = ItemViewModels.IndexOf(item);
         }
 
         #endregion
@@ -145,15 +146,15 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         private string RootName => "...";
 
-        public ReactiveCommand LoadFileCommand { get; set; }
+        public ReactiveCommand LoadFileCommand { get; private set; }
 
-        public ReactiveCommand CreateFileCommand { get; set; }
+        public ReactiveCommand CreateFileCommand { get; private set; }
 
-        public ReactiveCommand UpCommand { get; set; }
+        public ReactiveCommand UpCommand { get; private set; }
 
         #region CreateNodeCommand
 
-        public ReactiveCommand CreateNodeCommand { get; set; }
+        public ReactiveCommand CreateNodeCommand { get; private set; }
 
         private async void CreateNode()
         {
@@ -218,9 +219,9 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             }
         }
 
-        private Subject<bool> IsUpdating { get; } = new Subject<bool>();
+        private Subject<bool> IsUpdating { get; set; }
 
-        private Subject<string> FilePath { get; } = new Subject<string>();
+        private Subject<string> FilePath { get; set; }
 
         private ObservableAsPropertyHelper<bool> _hasFile;
 

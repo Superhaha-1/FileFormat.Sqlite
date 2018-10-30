@@ -6,7 +6,6 @@
     <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition/>
     </Grid.ColumnDefinitions>
     <iconPacks:PackIconModern Kind="Folder" Grid.Column="0" Foreground="{StaticResource Brushes.Icon.Folder}" Width="24" Height="24" Margin="3"/>
     <TextBox x:Name="TextBox_Name" VerticalAlignment="Center" Grid.Column="1" FontSize="12" controls:TextBoxHelper.SelectAllOnFocus="True">
