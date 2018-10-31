@@ -23,22 +23,22 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             RenameCommand = nodeManager.EndRenameNodeCommand;
             this.WhenActivated(d =>
             {
-                (NewNameErrors = new Subject<IEnumerable>()).DisposeWith(d);
+                //(NewNameErrors = new Subject<IEnumerable>()).DisposeWith(d);
                 //(_changedName = this.WhenAnyValue(r => r.NewName).Where(newName => NameValidator.Instance.Validate(newName).IsValid).Select(newName => (Name, newName)).ToProperty(this, r => r.ChangedName)).DisposeWith(d);
                 //(ChangedName = new Subject<(string, string)>()).DisposeWith(d);
-                //this.WhenAnyValue(r => r.NewName).Subscribe(newName =>
-                //{
-                //    var result = NameValidator.Instance.Validate(newName);
-                //    if (result.IsValid)
-                //    {
-                //        ChangedName.OnNext((Name, newName));
-                //        NewNameErrors.OnNext(null);
-                //    }
-                //    else
-                //    {
-                //        NewNameErrors.OnNext(result.Errors);
-                //    }
-                //}).DisposeWith(d);
+                this.WhenAnyValue(r => r.NewName).Subscribe(newName =>
+                {
+                    var result = NameValidator.Instance.Validate(newName);
+                    if (result.IsValid)
+                    {
+                        ChangedName = (Name, newName);
+                        NewNameErrors = null;
+                    }
+                    else
+                    {
+                        NewNameErrors = result.Errors;
+                    }
+                }).DisposeWith(d);
                 //ChangedName.OnNext((Name, NewName));
             });
         }
@@ -58,7 +58,37 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             }
         }
 
-        public Subject<IEnumerable> NewNameErrors { get; private set; }
+        private IEnumerable _newNameErrors;
+
+        public IEnumerable NewNameErrors
+        {
+            get
+            {
+                return _newNameErrors;
+            }
+
+            private set
+            {
+                this.RaiseAndSetIfChanged(ref _newNameErrors, value);
+            }
+        }
+
+        private (string, string) _changedName;
+
+        public (string, string) ChangedName
+        {
+            get
+            {
+                return _changedName;
+            }
+
+            private set
+            {
+                this.RaiseAndSetIfChanged(ref _changedName, value);
+            }
+        }
+
+        //public Subject<IEnumerable> NewNameErrors { get; private set; }
 
         //public Subject<(string, string)> ChangedName { get; private set; }
 
@@ -66,7 +96,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         //public (string, string) ChangedName { get; private set; }
 
-        public IObservable<(string, string)> ChangedName => this.WhenAnyValue(r => r.NewName).Where(newName => NameValidator.Instance.Validate(newName).IsValid).Select(newName => (Name, newName));
+        //public IObservable<(string, string)> ChangedName => this.WhenAnyValue(r => r.NewName).Where(newName => NameValidator.Instance.Validate(newName).IsValid).Select(newName => (Name, newName));
 
         public ICommand RenameCommand { get; }
     }

@@ -2,6 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+      xmlns:behaviors="clr-namespace:FileFormat.Sqlite.Demo.Behaviors"
+      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" x:Name="Grid_Main" Focusable="True">
     <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
@@ -9,6 +11,9 @@
     </Grid.ColumnDefinitions>
     <iconPacks:PackIconModern Kind="Folder" Grid.Column="0" Foreground="{StaticResource Brushes.Icon.Folder}" Width="24" Height="24" Margin="3"/>
     <TextBox x:Name="TextBox_Name" VerticalAlignment="Center" Grid.Column="1" FontSize="12" controls:TextBoxHelper.SelectAllOnFocus="True">
+        <i:Interaction.Behaviors>
+            <behaviors:ShowErrorsBehavior x:Name="ShowErrorsBehavior_TextBox_Name"/>
+        </i:Interaction.Behaviors>
         <TextBox.InputBindings>
             <KeyBinding x:Name="KeyBinding_Enter" Key="Enter"/>
         </TextBox.InputBindings>
