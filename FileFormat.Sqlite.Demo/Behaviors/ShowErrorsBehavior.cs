@@ -1,14 +1,8 @@
 ﻿using System.Collections;
-using System.Globalization;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
-using System.Windows.Media;
-using System.Collections.Generic;
-using System;
-using System.Text;
+using FileFormat.Sqlite.Demo.Adorners;
 
 namespace FileFormat.Sqlite.Demo.Behaviors
 {
@@ -75,66 +69,6 @@ namespace FileFormat.Sqlite.Demo.Behaviors
         protected override void OnDetaching()
         {
             base.OnDetaching();
-        }
-    }
-
-    public sealed class ErrorsAdorner : Adorner
-    {
-        public ErrorsAdorner(UIElement adornedElement) : base(adornedElement)
-        {
-            TextBlock_Errors = new TextBlock();
-            TextBlock_Errors.Background = Brushes.Red;
-        }
-
-        private TextBlock TextBlock_Errors { get; }
-
-        public void SetErrors(IEnumerable errors)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (var error in errors)
-                stringBuilder.Append(error.ToString());
-            TextBlock_Errors.Text = stringBuilder.ToString();
-        }
-
-        protected override Visual GetVisualChild(int index)
-        {
-            return TextBlock_Errors;
-        }
-
-        protected override int VisualChildrenCount
-        {
-            get
-            {
-                return 1;
-            }
-        }
-
-        protected override Size MeasureOverride(Size constraint)
-        {
-            var availableSize = new Size(AdornedElement.RenderSize.Width, AdornedElement.RenderSize.Height);
-            for (int i = 0; i < VisualChildrenCount; i++)
-            {
-                var childElement = GetVisualChild(i) as UIElement;
-                if (childElement != null)
-                {
-                    var renderSize = childElement.RenderSize;
-                    childElement.Measure(new Size(Math.Max(renderSize.Width, availableSize.Width), Math.Max(renderSize.Height, availableSize.Height)));
-                }
-            }
-            return availableSize;
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            TextBlock_Errors.Arrange(new Rect(new Point(-10, 20), TextBlock_Errors.DesiredSize));
-            return base.ArrangeOverride(finalSize);
-        }
-
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            base.OnRender(drawingContext);
-            var rect = new Rect(AdornedElement.RenderSize);
-            drawingContext.DrawRectangle(new SolidColorBrush(Colors.Transparent), new Pen(new SolidColorBrush(Colors.Red), 1d), rect);
         }
     }
 }

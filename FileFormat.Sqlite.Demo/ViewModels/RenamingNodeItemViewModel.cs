@@ -1,17 +1,11 @@
 ﻿using FileFormat.Sqlite.Demo.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ReactiveUI;
 using System.Windows.Input;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Collections;
-using System.ComponentModel;
-using FluentValidation;
-using System.Reactive.Subjects;
+using FileFormat.Sqlite.Demo.Validators;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
@@ -23,9 +17,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             RenameCommand = nodeManager.EndRenameNodeCommand;
             this.WhenActivated(d =>
             {
-                //(NewNameErrors = new Subject<IEnumerable>()).DisposeWith(d);
-                //(_changedName = this.WhenAnyValue(r => r.NewName).Where(newName => NameValidator.Instance.Validate(newName).IsValid).Select(newName => (Name, newName)).ToProperty(this, r => r.ChangedName)).DisposeWith(d);
-                //(ChangedName = new Subject<(string, string)>()).DisposeWith(d);
                 this.WhenAnyValue(r => r.NewName).Subscribe(newName =>
                 {
                     var result = NameValidator.Instance.Validate(newName);
@@ -39,7 +30,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                         NewNameErrors = result.Errors;
                     }
                 }).DisposeWith(d);
-                //ChangedName.OnNext((Name, NewName));
             });
         }
 
@@ -87,16 +77,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 this.RaiseAndSetIfChanged(ref _changedName, value);
             }
         }
-
-        //public Subject<IEnumerable> NewNameErrors { get; private set; }
-
-        //public Subject<(string, string)> ChangedName { get; private set; }
-
-        //private ObservableAsPropertyHelper<(string, string)> _changedName;
-
-        //public (string, string) ChangedName { get; private set; }
-
-        //public IObservable<(string, string)> ChangedName => this.WhenAnyValue(r => r.NewName).Where(newName => NameValidator.Instance.Validate(newName).IsValid).Select(newName => (Name, newName));
 
         public ICommand RenameCommand { get; }
     }

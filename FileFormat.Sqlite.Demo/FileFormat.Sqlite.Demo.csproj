@@ -239,6 +239,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="Adorners\ErrorsAdorner.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -246,6 +247,7 @@
     <Compile Include="Behaviors\ShowErrorsBehavior.cs" />
     <Compile Include="Interfaces\IDataManager.cs" />
     <Compile Include="Interfaces\INodeManager.cs" />
+    <Compile Include="Validators\NameValidator.cs" />
     <Compile Include="ViewModels\DataItemViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModelBase.cs" />
     <Compile Include="ViewModels\NodeItemViewModel.cs" />
