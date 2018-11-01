@@ -86,7 +86,7 @@ namespace FileFormat.Sqlite.Demo.Adorners
         {
             base.OnRender(drawingContext);
             var rect = new Rect(AdornedElement.RenderSize);
-            drawingContext.DrawRectangle(Brushes.Transparent, BorderPen, rect);
+            drawingContext.DrawRectangle(null, BorderPen, rect);
             var errorMark = new StreamGeometry();
             using (var context = errorMark.Open())
             {

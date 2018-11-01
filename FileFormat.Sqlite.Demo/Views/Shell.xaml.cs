@@ -2,7 +2,6 @@
 using System.Windows;
 using FileFormat.Sqlite.Demo.ViewModels;
 using ReactiveUI;
-using Splat;
 
 namespace FileFormat.Sqlite.Demo.Views
 {

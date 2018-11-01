@@ -8,8 +8,7 @@ namespace FileFormat.Sqlite.Demo.Validators
 
         private NameValidator()
         {
-            RuleFor(name => name).NotNull();
-            RuleFor(name => name).MaximumLength(20);
+            RuleFor(name => name).NotEmpty().MaximumLength(20).WithName("名称");
         }
     }
 }
