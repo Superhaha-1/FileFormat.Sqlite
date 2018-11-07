@@ -31,7 +31,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 (_deleteDataCommand = ReactiveCommand.Create<string>(DeleteData)).DisposeWith(d);
                 NodeNameList.Connect().Bind(out _nodeNames).Subscribe().DisposeWith(d);
                 NodeItemViewModelCache.Connect().Sort(SortExpressionComparer<ItemViewModelBase>.Ascending(i => i.Name)).Concat(DataItemViewModelCache.Connect().Sort(SortExpressionComparer<ItemViewModelBase>.Ascending(i => i.Name))).Bind(out _itemViewModels).Subscribe().DisposeWith(d);
-                this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).CombineLatest(IsUpdating, (int index, bool isUpdating) => new { index, isUpdating }).Where(x => !x.isUpdating).Select(x => x.index).Subscribe(SelectedNodeIndexChanged).DisposeWith(d);
+                this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).CombineLatest(IsUpdating, (index, isUpdating) => (index: index, isUpdating: isUpdating)).Where(x => !x.isUpdating).Select(x => x.index).Subscribe(SelectedNodeIndexChanged).DisposeWith(d);
                 FilePath.Subscribe(FilePathChanged).DisposeWith(d);
                 (_hasFile = FilePath.Select(f => f != null).ToProperty(this, s => s.HasFile)).DisposeWith(d);
                 IsUpdating.OnNext(false);
