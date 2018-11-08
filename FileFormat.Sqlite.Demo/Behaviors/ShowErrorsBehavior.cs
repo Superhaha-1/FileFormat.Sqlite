@@ -45,7 +45,7 @@ namespace FileFormat.Sqlite.Demo.Behaviors
             {
                 if(ErrorsAdorner == null)
                 {
-                    var adornerLayer = AdornerLayer.GetAdornerLayer(AssociatedObject);
+                    var adornerLayer = AssociatedObject.GetTopAdornerLayer();
                     ErrorsAdorner = new ErrorsAdorner(AssociatedObject);
                     ErrorsAdorner.SetErrors(Errors);
                     adornerLayer.Add(ErrorsAdorner);

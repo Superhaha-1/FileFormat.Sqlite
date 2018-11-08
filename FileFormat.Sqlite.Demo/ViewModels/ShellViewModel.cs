@@ -10,6 +10,12 @@ using System.Reactive.Subjects;
 using FileFormat.Sqlite.Demo.Interfaces;
 using System.Windows.Input;
 using DynamicData.Binding;
+using MahApps.Metro.Controls.Dialogs;
+using System.Threading.Tasks;
+using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Windows.Threading;
+using System.Windows;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
@@ -35,6 +41,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 FilePath.Subscribe(FilePathChanged).DisposeWith(d);
                 (_hasFile = FilePath.Select(f => f != null).ToProperty(this, s => s.HasFile)).DisposeWith(d);
                 IsUpdating.OnNext(false);
+
+                Observable.Return(Unit.Default).Subscribe(u => FilePath.OnNext(@"C:\Users\super\Desktop\Test.mrpd"));
             });
         }
 
@@ -89,7 +97,9 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         private void StartRenameNode(string name)
         {
-            UpdateNodeCache(cache => cache.AddOrUpdate(new RenamingNodeItemViewModel(name, this)));
+            var item = new RenamingNodeItemViewModel(name, this);
+            UpdateNodeCache(cache => cache.AddOrUpdate(item));
+            item.Focus();
         }
 
         #endregion
@@ -111,6 +121,15 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 {
                     cache.AddOrUpdate(item);
                 });
+                return;
+            }
+            else if(NodeItemViewModelCache.Keys.Contains(newName))
+            {
+                //await this.ShowMessageAsync("警告", "与其他名称重复");
+                await this.ShowProgressAsync("警告", "与其他名称重复", 500);
+                var renamingNodeItem = NodeItemViewModelCache.Items.First(i => i is RenamingNodeItemViewModel) as RenamingNodeItemViewModel;
+                SelectedItemIndex = ItemViewModels.IndexOf(renamingNodeItem);
+                renamingNodeItem.Focus();
                 return;
             }
             NodeItemViewModelCache.Edit(cache =>
@@ -168,7 +187,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                     break;
             }
             await Connection.CreateNodeAsync(name, false);
-            var newNode = new NodeItemViewModel(name, this);
+            var newNode = new RenamingNodeItemViewModel(name, this);
             NodeItemViewModelCache.AddOrUpdate(newNode);
             SelectedItemIndex = ItemViewModels.IndexOf(newNode);
         }
@@ -245,11 +264,14 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         private async void FilePathChanged(string filePath)
         {
-            UpdateSelectedNodeIndex(i => -1);
-            Connection?.Dispose();
-            Connection = await new FileConnection(filePath).ConnectRootNodeAsync();
-            NodeNameList.Add(RootName);
-            UpdateSelectedNodeIndex(i => 0);
+            await this.ShowProgressAsync("请等待", "正在加载文件", async () =>
+              {
+                  UpdateSelectedNodeIndex(i => -1);
+                  Connection?.Dispose();
+                  Connection = await new FileConnection(filePath).ConnectRootNodeAsync();
+                  NodeNameList.Add(RootName);
+                  UpdateSelectedNodeIndex(i => 0);
+              });
         }
 
         private async void SelectedNodeIndexChanged(int index)

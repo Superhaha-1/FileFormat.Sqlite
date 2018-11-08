@@ -247,6 +247,7 @@
     <Compile Include="Behaviors\LostKeyboardFocusBehavior.cs" />
     <Compile Include="Behaviors\ShowErrorsBehavior.cs" />
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Interfaces\IDataManager.cs" />
     <Compile Include="Interfaces\INodeManager.cs" />
     <Compile Include="Validators\NameValidator.cs" />

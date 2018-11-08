@@ -1,7 +1,10 @@
 ﻿using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows;
 using FileFormat.Sqlite.Demo.ViewModels;
+using MahApps.Metro.Controls.Dialogs;
 using ReactiveUI;
+using System;
 
 namespace FileFormat.Sqlite.Demo.Views
 {
@@ -14,6 +17,7 @@ namespace FileFormat.Sqlite.Demo.Views
         {
             InitializeComponent();
             ViewModel = new ShellViewModel();
+            DialogParticipation.SetRegister(this, ViewModel);
             this.WhenActivated(d =>
             {
                 this.BindCommand(ViewModel, vm => vm.LoadFileCommand, v => v.MenuItem_LoadFile).DisposeWith(d);

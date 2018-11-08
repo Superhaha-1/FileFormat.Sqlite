@@ -6,6 +6,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Collections;
 using FileFormat.Sqlite.Demo.Validators;
+using System.Reactive.Subjects;
+using System.Reactive;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
@@ -30,6 +32,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                         NewNameErrors = result.Errors;
                     }
                 }).DisposeWith(d);
+
+                new Disposable(nameof(RenamingNodeItemViewModel)).DisposeWith(d);
             });
         }
 
@@ -78,6 +82,27 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             }
         }
 
+        private bool _isFocus;
+
+        public bool IsFocus
+        {
+            get
+            {
+                return _isFocus;
+            }
+
+            private set
+            {
+                this.RaiseAndSetIfChanged(ref _isFocus, value);
+            }
+        }
+
         public ICommand RenameCommand { get; }
+
+        public void Focus()
+        {
+            IsFocus = false;
+            IsFocus = true;
+        }
     }
 }

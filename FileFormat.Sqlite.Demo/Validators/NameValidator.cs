@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using System.Linq;
 
 namespace FileFormat.Sqlite.Demo.Validators
 {
@@ -8,7 +9,7 @@ namespace FileFormat.Sqlite.Demo.Validators
 
         private NameValidator()
         {
-            RuleFor(name => name).NotEmpty().MaximumLength(20).WithName("名称");
+            RuleFor(name => name).Cascade(CascadeMode.StopOnFirstFailure).NotEmpty().Matches("^[A-z0-9\u4e00-\u9fa5_-]{1,30}$").WithName("名称");
         }
     }
 }
