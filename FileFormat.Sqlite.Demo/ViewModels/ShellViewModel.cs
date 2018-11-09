@@ -16,6 +16,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Windows.Threading;
 using System.Windows;
+using System.IO;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
@@ -23,10 +24,10 @@ namespace FileFormat.Sqlite.Demo.ViewModels
     {
         public ShellViewModel()
         {
+            IsUpdating = new BehaviorSubject<bool>(false);
+            FilePath = new BehaviorSubject<string>(@"C:\Users\super\Desktop\Test.mrpd");
             this.WhenActivated(d =>
             {
-                (IsUpdating = new Subject<bool>()).DisposeWith(d);
-                (FilePath = new Subject<string>()).DisposeWith(d);
                 (LoadFileCommand = ReactiveCommand.Create(LoadFile)).DisposeWith(d);
                 (UpCommand = ReactiveCommand.Create(Up, this.WhenAnyValue(s => s.SelectedNodeIndex).Select(i => i > 0))).DisposeWith(d);
                 (CreateNodeCommand = ReactiveCommand.Create(CreateNode)).DisposeWith(d);
@@ -39,10 +40,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 NodeItemViewModelCache.Connect().Sort(SortExpressionComparer<ItemViewModelBase>.Ascending(i => i.Name)).Concat(DataItemViewModelCache.Connect().Sort(SortExpressionComparer<ItemViewModelBase>.Ascending(i => i.Name))).Bind(out _itemViewModels).Subscribe().DisposeWith(d);
                 this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).CombineLatest(IsUpdating, (index, isUpdating) => (index: index, isUpdating: isUpdating)).Where(x => !x.isUpdating).Select(x => x.index).Subscribe(SelectedNodeIndexChanged).DisposeWith(d);
                 FilePath.Subscribe(FilePathChanged).DisposeWith(d);
-                (_hasFile = FilePath.Select(f => f != null).ToProperty(this, s => s.HasFile)).DisposeWith(d);
-                IsUpdating.OnNext(false);
-
-                Observable.Return(Unit.Default).Subscribe(u => FilePath.OnNext(@"C:\Users\super\Desktop\Test.mrpd"));
+                FilePath.Select(f => f != null).ToProperty(this, s => s.HasFile, out _hasFile).DisposeWith(d);
             });
         }
 
@@ -238,9 +236,9 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             }
         }
 
-        private Subject<bool> IsUpdating { get; set; }
+        private BehaviorSubject<bool> IsUpdating { get; }
 
-        private Subject<string> FilePath { get; set; }
+        private BehaviorSubject<string> FilePath { get; }
 
         private ObservableAsPropertyHelper<bool> _hasFile;
 
@@ -264,6 +262,8 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         private async void FilePathChanged(string filePath)
         {
+            if (!File.Exists(filePath))
+                return;
             await this.ShowProgressAsync("请等待", "正在加载文件", async () =>
               {
                   UpdateSelectedNodeIndex(i => -1);
