@@ -56,7 +56,7 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         public async Task<Node> GetRootNodeAsync()
         {
-            return await Nodes.FindAsync(1);
+            return await Task.Run(() => Nodes.Find(1));
         }
     }
 }

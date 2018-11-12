@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Windows;
 using System;
 using System.Reactive.Linq;
+using System.Windows.Threading;
 
 namespace FileFormat.Sqlite.Demo.Views
 {
@@ -20,8 +21,7 @@ namespace FileFormat.Sqlite.Demo.Views
                 this.Bind(ViewModel, vm => vm.NewName, v => v.TextBox_Name.Text).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.RenameCommand, v => v.TextBox_Name, vm => vm.ChangedName, nameof(TextBox_Name.LostKeyboardFocus)).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.NewNameErrors, v => v.ShowErrorsBehavior_TextBox_Name.Errors).DisposeWith(d);
-                this.WhenAnyValue(v => v.ViewModel.IsFocus).Where(isFocus => isFocus).Subscribe(u => TextBox_Name.Focus()).DisposeWith(d);
-                //TextBox_Name.Focus();
+                this.WhenAnyObservable(v => v.ViewModel.IsFocus).ObserveOnDispatcher(DispatcherPriority.Background).Subscribe(u => TextBox_Name.Focus()).DisposeWith(d);
                 new Disposable(nameof(RenamingNodeItemView)).DisposeWith(d);
             });
         }

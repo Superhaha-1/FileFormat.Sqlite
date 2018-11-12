@@ -24,7 +24,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
     {
         public ShellViewModel()
         {
-            IsUpdating = new BehaviorSubject<bool>(false);
             FilePath = new BehaviorSubject<string>(@"C:\Users\super\Desktop\Test.mrpd");
             this.WhenActivated(d =>
             {
@@ -36,9 +35,9 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 (_startRenameNodeCommand = ReactiveCommand.Create<string>(StartRenameNode)).DisposeWith(d);
                 (_endRenameNodeCommand = ReactiveCommand.Create<(string, string)>(EndRenameNode)).DisposeWith(d);
                 (_deleteDataCommand = ReactiveCommand.Create<string>(DeleteData)).DisposeWith(d);
-                NodeNameList.Connect().Bind(out _nodeNames).Subscribe().DisposeWith(d);
+                NodeNameList.Connect().ObserveOnDispatcher(DispatcherPriority.Background).Bind(out _nodeNames).Subscribe().DisposeWith(d);
                 NodeItemViewModelCache.Connect().Sort(SortExpressionComparer<ItemViewModelBase>.Ascending(i => i.Name)).Concat(DataItemViewModelCache.Connect().Sort(SortExpressionComparer<ItemViewModelBase>.Ascending(i => i.Name))).Bind(out _itemViewModels).Subscribe().DisposeWith(d);
-                this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).CombineLatest(IsUpdating, (index, isUpdating) => (index: index, isUpdating: isUpdating)).Where(x => !x.isUpdating).Select(x => x.index).Subscribe(SelectedNodeIndexChanged).DisposeWith(d);
+                this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).Subscribe(SelectedNodeIndexChanged).DisposeWith(d);
                 FilePath.Subscribe(FilePathChanged).DisposeWith(d);
                 FilePath.Select(f => f != null).ToProperty(this, s => s.HasFile, out _hasFile).DisposeWith(d);
             });
@@ -75,7 +74,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         private void EnterNode(string name)
         {
             NodeNameList.Add(name);
-            UpdateSelectedNodeIndex(i => i + 1);
+            SelectedNodeIndex += 1;
         }
 
         #endregion
@@ -97,7 +96,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         {
             var item = new RenamingNodeItemViewModel(name, this);
             UpdateNodeCache(cache => cache.AddOrUpdate(item));
-            item.Focus();
         }
 
         #endregion
@@ -123,11 +121,10 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             }
             else if(NodeItemViewModelCache.Keys.Contains(newName))
             {
-                //await this.ShowMessageAsync("警告", "与其他名称重复");
                 await this.ShowProgressAsync("警告", "与其他名称重复", 500);
                 var renamingNodeItem = NodeItemViewModelCache.Items.First(i => i is RenamingNodeItemViewModel) as RenamingNodeItemViewModel;
-                SelectedItemIndex = ItemViewModels.IndexOf(renamingNodeItem);
                 renamingNodeItem.Focus();
+                SelectedItemIndex = ItemViewModels.IndexOf(renamingNodeItem);
                 return;
             }
             NodeItemViewModelCache.Edit(cache =>
@@ -236,8 +233,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             }
         }
 
-        private BehaviorSubject<bool> IsUpdating { get; }
-
         private BehaviorSubject<string> FilePath { get; }
 
         private ObservableAsPropertyHelper<bool> _hasFile;
@@ -266,11 +261,16 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 return;
             await this.ShowProgressAsync("请等待", "正在加载文件", async () =>
               {
-                  UpdateSelectedNodeIndex(i => -1);
                   Connection?.Dispose();
-                  Connection = await new FileConnection(filePath).ConnectRootNodeAsync();
-                  NodeNameList.Add(RootName);
-                  UpdateSelectedNodeIndex(i => 0);
+                  var fileConnection = new FileConnection(filePath);
+                  Connection = await fileConnection.ConnectRootNodeAsync();
+                  NodeNameList.Edit(cache =>
+                   {
+                       cache.Clear();
+                       cache.Add(RootName);
+                   });
+                  if (SelectedNodeIndex == -1)
+                      SelectedNodeIndex = 0;
               });
         }
 
@@ -278,20 +278,14 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         {
             if (index == -1)
             {
-                NodeNameList.Clear();
-                NodeItemViewModelCache.Clear();
-                DataItemViewModelCache.Clear();
+                SelectedNodeIndex = 0;
                 return;
             }
 
             int lastIndex = NodeNameList.Count - 1;
             if (index < lastIndex)
             {
-                NodeNameList.Edit(list =>
-                {
-                    for (int i = lastIndex; i > index; i--)
-                        list.RemoveAt(i);
-                });
+                NodeNameList.RemoveRange(index + 1, lastIndex - index);
             }
 
             await Connection.MoveToAsync(NodeNameList.Items.Skip(1));
@@ -299,26 +293,21 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             NodeItemViewModelCache.Edit(async cache =>
             {
                 cache.Clear();
-                cache.AddOrUpdate((await Connection.GetChildrenNodeNamesAsync()).Select(n => new NodeItemViewModel(n, this)));
+                var names = await Connection.GetChildrenNodeNamesAsync();
+                cache.AddOrUpdate(names.Select(n => new NodeItemViewModel(n, this)));
             });
 
             DataItemViewModelCache.Edit(async cache =>
             {
                 cache.Clear();
-                cache.AddOrUpdate((await Connection.GetChildrenDataNamesAsync()).Select(n => new DataItemViewModel(n, this)));
+                var names = await Connection.GetChildrenDataNamesAsync();
+                cache.AddOrUpdate(names.Select(n => new DataItemViewModel(n, this)));
             });
-        }
-
-        private void UpdateSelectedNodeIndex(Func<int, int> updateAction)
-        {
-            IsUpdating.OnNext(true);
-            SelectedNodeIndex = updateAction.Invoke(SelectedNodeIndex);
-            IsUpdating.OnNext(false);
         }
 
         private void Up()
         {
-            UpdateSelectedNodeIndex(i => i - 1);
+            SelectedNodeIndex -= 1;
         }
     }
 }

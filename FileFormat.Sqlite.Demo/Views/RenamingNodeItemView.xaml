@@ -15,8 +15,5 @@
             <behaviors:ShowErrorsBehavior x:Name="ShowErrorsBehavior_TextBox_Name"/>
             <behaviors:LostKeyboardFocusBehavior/>
         </i:Interaction.Behaviors>
-        <TextBox.InputBindings>
-            <KeyBinding x:Name="KeyBinding_Enter" Key="Enter"/>
-        </TextBox.InputBindings>
     </TextBox>
 </Grid>

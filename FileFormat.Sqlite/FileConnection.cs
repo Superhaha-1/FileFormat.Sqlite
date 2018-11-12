@@ -34,7 +34,8 @@ namespace FileFormat.Sqlite
         public async Task<NodeConnection> ConnectRootNodeAsync()
         {
             var context = new FileFormatContext(FilePath);
-            return new NodeConnection(context, await context.GetRootNodeAsync());
+            var node = await context.GetRootNodeAsync();
+            return new NodeConnection(context, node);
         }
 
         /// <summary>

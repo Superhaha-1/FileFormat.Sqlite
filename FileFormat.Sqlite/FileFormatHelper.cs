@@ -8,6 +8,8 @@ namespace FileFormat.Sqlite
     {
         private static char Separator => '.';
 
+        private static char Space => ' ';
+
         internal static string[] GetChidrenNames(this string fullName)
         {
             if (string.IsNullOrEmpty(fullName))
@@ -20,7 +22,7 @@ namespace FileFormat.Sqlite
         {
             if (string.IsNullOrEmpty(name))
                 throw new Exception("Name为空");
-            if (name.Contains(' '))
+            if (name.Contains(Space))
                 throw new Exception("Name中有空字符");
         }
 
@@ -30,16 +32,6 @@ namespace FileFormat.Sqlite
                 throw new Exception("数据不能为空");
         }
 
-        private static char[] InvalidPathChars { get; } = Path.GetInvalidPathChars().Intersect(new char[] { Separator }).ToArray();
-
-        public static (bool isValid, string describe) IsValidName(this string name)
-        {
-            foreach(var c in InvalidPathChars)
-            {
-                if (name.Contains(c))
-                    return (false, $"名称中不能包含{c}");
-            }
-            return (true, null);
-        }
+        public static char[] InvalidPathChars { get; } = Path.GetInvalidPathChars().Union(new char[] { Separator, Space }).ToArray();
     }
 }

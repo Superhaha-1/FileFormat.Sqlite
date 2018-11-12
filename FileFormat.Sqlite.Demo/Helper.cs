@@ -22,6 +22,13 @@ namespace FileFormat.Sqlite.Demo
             return VisualTreeHelper.GetParent(o).GetTopAdornerLayer() ?? topAdornerLayer;
         }
 
+        public static T FindTree<T>(this DependencyObject o) where T : Visual
+        {
+            if (o == null)
+                return null;
+            return o as T ?? FindTree<T>(VisualTreeHelper.GetParent(o));
+        }
+
         public static async Task ShowProgressAsync(this object viewModel, string title, string message, int waitMillisecondsDelay = 1000)
         {
             var controller = await DialogCoordinator.Instance.ShowProgressAsync(viewModel, title, message);
@@ -34,7 +41,6 @@ namespace FileFormat.Sqlite.Demo
         {
             var controller = await DialogCoordinator.Instance.ShowProgressAsync(viewModel, title, message);
             controller.SetIndeterminate();
-            await Task.Delay(TimeSpan.FromMilliseconds(500));
             await work.Invoke();
             await controller.CloseAsync();
         }

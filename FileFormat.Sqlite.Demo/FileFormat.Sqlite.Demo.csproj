@@ -240,6 +240,7 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="Adorners\ErrorsAdorner.cs" />
+    <Compile Include="Adorners\MaskAdorner.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

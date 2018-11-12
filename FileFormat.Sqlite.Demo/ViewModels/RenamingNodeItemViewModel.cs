@@ -17,6 +17,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         {
             _newName = name;
             RenameCommand = nodeManager.EndRenameNodeCommand;
+            _isFocus = new BehaviorSubject<Unit>(Unit.Default);
             this.WhenActivated(d =>
             {
                 this.WhenAnyValue(r => r.NewName).Subscribe(newName =>
@@ -82,27 +83,15 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             }
         }
 
-        private bool _isFocus;
+        private BehaviorSubject<Unit> _isFocus;
 
-        public bool IsFocus
-        {
-            get
-            {
-                return _isFocus;
-            }
-
-            private set
-            {
-                this.RaiseAndSetIfChanged(ref _isFocus, value);
-            }
-        }
+        public IObservable<Unit> IsFocus => _isFocus;
 
         public ICommand RenameCommand { get; }
 
         public void Focus()
         {
-            IsFocus = false;
-            IsFocus = true;
+            _isFocus.OnNext(Unit.Default);
         }
     }
 }
