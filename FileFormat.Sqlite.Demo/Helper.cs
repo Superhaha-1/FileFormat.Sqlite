@@ -12,6 +12,8 @@ namespace FileFormat.Sqlite.Demo
     {
         public static AdornerLayer GetTopAdornerLayer(this DependencyObject o)
         {
+            if (o == null)
+                return null;
             AdornerLayer topAdornerLayer = null;
             if (o is Visual visual)
             {

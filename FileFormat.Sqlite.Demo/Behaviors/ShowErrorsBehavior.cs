@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
@@ -38,7 +39,7 @@ namespace FileFormat.Sqlite.Demo.Behaviors
 
         private void ErrorsChangedCallback(IEnumerable errors)
         {
-            if(errors == null)
+            if (errors == null)
             {
                 if (ErrorsAdorner != null)
                 {
@@ -48,17 +49,16 @@ namespace FileFormat.Sqlite.Demo.Behaviors
             }
             else
             {
-                if(ErrorsAdorner == null)
+                if (ErrorsAdorner == null)
                 {
-                    var adornerLayer = AssociatedObject.GetTopAdornerLayer();
+                    //var adornerLayer = AssociatedObject.GetTopAdornerLayer();
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(AssociatedObject);
+                    if (adornerLayer == null)
+                        throw new Exception("该元素没有AdornerLayer");
                     ErrorsAdorner = new ErrorsAdorner(AssociatedObject);
-                    ErrorsAdorner.SetErrors(Errors);
                     adornerLayer.Add(ErrorsAdorner);
                 }
-                else
-                {
-                    ErrorsAdorner.SetErrors(Errors);
-                }
+                ErrorsAdorner.SetErrors(Errors);
             }
         }
 

@@ -123,6 +123,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             {
                 await this.ShowProgressAsync("警告", "与其他名称重复", 500);
                 var renamingNodeItem = NodeItemViewModelCache.Items.First(i => i is RenamingNodeItemViewModel) as RenamingNodeItemViewModel;
+                renamingNodeItem.NewName = newName;
                 renamingNodeItem.Focus();
                 SelectedItemIndex = ItemViewModels.IndexOf(renamingNodeItem);
                 return;

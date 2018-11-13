@@ -5,6 +5,9 @@
       xmlns:behaviors="clr-namespace:FileFormat.Sqlite.Demo.Behaviors"
       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" x:Name="Grid_Main" Focusable="True">
+    <i:Interaction.Behaviors>
+        <behaviors:SetMaskBehavior IsCovered="True"/>
+    </i:Interaction.Behaviors>
     <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
@@ -14,7 +17,6 @@
         <i:Interaction.Behaviors>
             <behaviors:ShowErrorsBehavior x:Name="ShowErrorsBehavior_TextBox_Name"/>
             <behaviors:LostKeyboardFocusBehavior/>
-            <behaviors:SetMaskBehavior IsCovered="True"/>
         </i:Interaction.Behaviors>
     </TextBox>
 </Grid>
