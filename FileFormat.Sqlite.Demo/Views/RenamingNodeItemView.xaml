@@ -14,6 +14,7 @@
         <i:Interaction.Behaviors>
             <behaviors:ShowErrorsBehavior x:Name="ShowErrorsBehavior_TextBox_Name"/>
             <behaviors:LostKeyboardFocusBehavior/>
+            <behaviors:SetMaskBehavior IsCovered="True"/>
         </i:Interaction.Behaviors>
     </TextBox>
 </Grid>

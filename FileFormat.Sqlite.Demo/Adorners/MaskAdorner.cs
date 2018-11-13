@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 
@@ -17,7 +18,20 @@ namespace FileFormat.Sqlite.Demo.Adorners
 
         public MaskAdorner(UIElement adornedElement) : base(adornedElement)
         {
-          
+            var window = AdornedElement.FindTree<Window>();
+            var element = adornedElement as FrameworkElement;
+            if (element == null)
+                throw new Exception("只能应用到FrameworkElement");
+            Loaded += (s, e) =>
+            {
+                element.SizeChanged += SizeChangedCallback;
+                window.SizeChanged += SizeChangedCallback;
+            };
+            Unloaded += (s, e) =>
+            {
+                element.SizeChanged -= SizeChangedCallback;
+                window.SizeChanged -= SizeChangedCallback;
+            };
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -25,7 +39,18 @@ namespace FileFormat.Sqlite.Demo.Adorners
             base.OnRender(drawingContext);
             var window = AdornedElement.FindTree<Window>();
             var top = AdornedElement.TranslatePoint(new Point(0, 0), window);
-            drawingContext.DrawGeometry(MaskBrush, null, new RectangleGeometry(new Rect(top, AdornedElement.RenderSize)));
+            drawingContext.DrawGeometry(MaskBrush, null, new GeometryGroup()
+            {
+                Children ={
+                    new RectangleGeometry(new Rect(new Point(-top.X, -top.Y),window.RenderSize)),
+                    new RectangleGeometry(new Rect(new Point(0, 0), AdornedElement.RenderSize))
+                }
+            });
+        }
+
+        private void SizeChangedCallback(object sender, SizeChangedEventArgs e)
+        {
+            InvalidateVisual();
         }
     }
 }

@@ -246,6 +246,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Behaviors\LostKeyboardFocusBehavior.cs" />
+    <Compile Include="Behaviors\SetMaskBehavior.cs" />
     <Compile Include="Behaviors\ShowErrorsBehavior.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="Helper.cs" />

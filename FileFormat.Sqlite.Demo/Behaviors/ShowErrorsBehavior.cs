@@ -6,7 +6,7 @@ using FileFormat.Sqlite.Demo.Adorners;
 
 namespace FileFormat.Sqlite.Demo.Behaviors
 {
-    public sealed class ShowErrorsBehavior : Behavior<UIElement>
+    public sealed class ShowErrorsBehavior : Behavior<FrameworkElement>
     {
         #region Errors
 
@@ -24,14 +24,19 @@ namespace FileFormat.Sqlite.Demo.Behaviors
         }
 
         public static readonly DependencyProperty ErrorsProperty =
-            DependencyProperty.Register(nameof(Errors), typeof(IEnumerable), typeof(ShowErrorsBehavior), new PropertyMetadata(ErrorsPropertyChangedCallback));
+            DependencyProperty.Register(nameof(Errors), typeof(IEnumerable), typeof(ShowErrorsBehavior), new PropertyMetadata(null, ErrorsChanged, CoerceErrors));
 
-        private static void ErrorsPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+        private static void ErrorsChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
         {
-            (dependencyObject as ShowErrorsBehavior).ErrorsChanged(e.NewValue as IEnumerable);
+            (dependencyObject as ShowErrorsBehavior).ErrorsChangedCallback(e.NewValue as IEnumerable);
         }
 
-        private void ErrorsChanged(IEnumerable errors)
+        private static object CoerceErrors(DependencyObject dependencyObject, object value)
+        {
+            return (dependencyObject as ShowErrorsBehavior).CoerceErrorsCallback(value);
+        }
+
+        private void ErrorsChangedCallback(IEnumerable errors)
         {
             if(errors == null)
             {
@@ -57,6 +62,13 @@ namespace FileFormat.Sqlite.Demo.Behaviors
             }
         }
 
+        private object CoerceErrorsCallback(object value)
+        {
+            if (AssociatedObject == null)
+                return Errors;
+            return value;
+        }
+
         #endregion
 
         private ErrorsAdorner ErrorsAdorner { get; set; }
@@ -64,11 +76,18 @@ namespace FileFormat.Sqlite.Demo.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
+            AssociatedObject.Loaded += AssociatedObjectLoadedCallback;
         }
 
         protected override void OnDetaching()
         {
             base.OnDetaching();
+            AssociatedObject.Loaded -= AssociatedObjectLoadedCallback;
+        }
+
+        private void AssociatedObjectLoadedCallback(object sender, RoutedEventArgs e)
+        {
+            CoerceValue(ErrorsProperty);
         }
     }
 }
