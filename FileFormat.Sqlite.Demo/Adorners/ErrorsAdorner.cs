@@ -1,4 +1,4 @@
-﻿using System;
+﻿using MahApps.Metro.Controls;
 using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,21 +9,25 @@ namespace FileFormat.Sqlite.Demo.Adorners
 {
     public sealed class ErrorsAdorner : Adorner
     {
+        private static Pen BorderPen { get; }
+
+        private static Brush ErrorBrush { get; }
+
+        private static Brush TextBrush { get; }
+
         static ErrorsAdorner()
         {
             ErrorBrush = Brushes.Red;
             TextBrush = Brushes.White;
-            MarkLength = 5d;
             BorderPen = new Pen(ErrorBrush, 1d);
             BorderPen.Freeze();
         }
 
         public ErrorsAdorner(UIElement adornedElement) : base(adornedElement)
         {
-            TextBlock_Error = new TextBlock();
-            TextBlock_Error.Padding = new Thickness(3);
-            TextBlock_Error.Background = ErrorBrush;
-            TextBlock_Error.Foreground = TextBrush;
+            Popup_Error = new CustomValidationPopup() { AllowsTransparency = true, IsOpen = true, CloseOnMouseLeftButtonDown = false, PlacementTarget = adornedElement };
+            TextBlock_Error = new TextBlock() { Padding = new Thickness(3), Background = ErrorBrush, Foreground = TextBrush };
+            Popup_Error.Child = TextBlock_Error;
             TextBlock_Error.MouseEnter += (s, e) =>
             {
                 TextBlock_Error.Opacity = 0.2;
@@ -32,18 +36,8 @@ namespace FileFormat.Sqlite.Demo.Adorners
             {
                 TextBlock_Error.Opacity = 1;
             };
-            AddVisualChild(TextBlock_Error);
+            AddVisualChild(Popup_Error);
         }
-
-        private TextBlock TextBlock_Error { get; }
-
-        private static Pen BorderPen { get; }
-
-        private static Brush ErrorBrush { get; }
-
-        private static Brush TextBrush { get; }
-
-        private static double MarkLength { get; }
 
         public void SetErrors(IEnumerable errors)
         {
@@ -54,31 +48,20 @@ namespace FileFormat.Sqlite.Demo.Adorners
             }
         }
 
+        private CustomValidationPopup Popup_Error { get; }
+
+        private TextBlock TextBlock_Error { get; }
+
         protected override Visual GetVisualChild(int index)
         {
-            return TextBlock_Error;
+            return Popup_Error;
         }
 
         protected override int VisualChildrenCount => 1;
 
-        protected override Size MeasureOverride(Size constraint)
-        {
-            var availableSize = new Size(AdornedElement.RenderSize.Width, AdornedElement.RenderSize.Height);
-            for (int i = 0; i < VisualChildrenCount; i++)
-            {
-                if (GetVisualChild(i) is UIElement childElement)
-                {
-                    var renderSize = childElement.RenderSize;
-                    childElement.Measure(new Size(Math.Max(renderSize.Width, availableSize.Width), Math.Max(renderSize.Height, availableSize.Height)));
-                }
-            }
-            return availableSize;
-        }
-
         protected override Size ArrangeOverride(Size finalSize)
         {
-            var size = AdornedElement.RenderSize;
-            TextBlock_Error.Arrange(new Rect(new Point(size.Width + 3, 3), TextBlock_Error.RenderSize));
+            Popup_Error.PlacementRectangle = new Rect(new Point(-3, 0), new Size(finalSize.Width + 6, finalSize.Height));
             return base.ArrangeOverride(finalSize);
         }
 
@@ -90,9 +73,9 @@ namespace FileFormat.Sqlite.Demo.Adorners
             var errorMark = new StreamGeometry();
             using (var context = errorMark.Open())
             {
-                context.BeginFigure(new Point(rect.Right - MarkLength, 0), true, true);
+                context.BeginFigure(new Point(rect.Right - 5, 0), true, true);
                 context.LineTo(rect.TopRight, false, false);
-                context.LineTo(new Point(rect.Right, MarkLength), false, false);
+                context.LineTo(new Point(rect.Right, 5), false, false);
             }
             errorMark.Freeze();
             drawingContext.DrawGeometry(ErrorBrush, null, errorMark);

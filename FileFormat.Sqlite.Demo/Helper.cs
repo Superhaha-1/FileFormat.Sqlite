@@ -10,36 +10,36 @@ namespace FileFormat.Sqlite.Demo
 {
     public static class Helper
     {
-        public static AdornerLayer GetTopAdornerLayer(this DependencyObject o)
-        {
-            if (o == null)
-                return null;
-            AdornerLayer topAdornerLayer = null;
-            if (o is Visual visual)
-            {
-                topAdornerLayer = AdornerLayer.GetAdornerLayer(visual);
-            }
-            if (topAdornerLayer == null)
-                return null;
-            return VisualTreeHelper.GetParent(o).GetTopAdornerLayer() ?? topAdornerLayer;
-        }
+        //public static AdornerLayer GetTopAdornerLayer(this DependencyObject o)
+        //{
+        //    if (o == null)
+        //        return null;
+        //    AdornerLayer topAdornerLayer = null;
+        //    if (o is Visual visual)
+        //    {
+        //        topAdornerLayer = AdornerLayer.GetAdornerLayer(visual);
+        //    }
+        //    if (topAdornerLayer == null)
+        //        return null;
+        //    return VisualTreeHelper.GetParent(o).GetTopAdornerLayer() ?? topAdornerLayer;
+        //}
 
-        public static T FindTree<T>(this DependencyObject o) where T : Visual
-        {
-            if (o == null)
-                return null;
-            return o as T ?? FindTree<T>(VisualTreeHelper.GetParent(o));
-        }
+        //public static T FindTree<T>(this DependencyObject o) where T : Visual
+        //{
+        //    if (o == null)
+        //        return null;
+        //    return o as T ?? FindTree<T>(VisualTreeHelper.GetParent(o));
+        //}
 
-        public static DependencyObject GetTop(this DependencyObject o)
-        {
-            if (o == null)
-                return null;
-            var parent = VisualTreeHelper.GetParent(o);
-            if (parent == null)
-                return o;
-            return GetTop(parent);
-        }
+        //public static DependencyObject GetTop(this DependencyObject o)
+        //{
+        //    if (o == null)
+        //        return null;
+        //    var parent = VisualTreeHelper.GetParent(o);
+        //    if (parent == null)
+        //        return o;
+        //    return GetTop(parent);
+        //}
 
         public static async Task ShowProgressAsync(this object viewModel, string title, string message, int waitMillisecondsDelay = 1000)
         {
