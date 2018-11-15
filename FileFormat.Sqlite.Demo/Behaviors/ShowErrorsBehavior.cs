@@ -51,7 +51,6 @@ namespace FileFormat.Sqlite.Demo.Behaviors
             {
                 if (ErrorsAdorner == null)
                 {
-                    //var adornerLayer = AssociatedObject.GetTopAdornerLayer();
                     var adornerLayer = AdornerLayer.GetAdornerLayer(AssociatedObject);
                     if (adornerLayer == null)
                         throw new Exception("该元素没有AdornerLayer");

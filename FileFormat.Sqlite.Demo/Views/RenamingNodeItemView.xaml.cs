@@ -5,15 +5,19 @@ using System.Windows;
 using System;
 using System.Reactive.Linq;
 using System.Windows.Threading;
+using System.ComponentModel.Composition;
 
 namespace FileFormat.Sqlite.Demo.Views
 {
     /// <summary>
     /// RenamingNodeItemView.xaml 的交互逻辑
     /// </summary>
+    [Export(typeof(IViewFor<RenamingNodeItemViewModel>))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class RenamingNodeItemView : IViewFor<RenamingNodeItemViewModel>
     {
-        public RenamingNodeItemView()
+        [ImportingConstructor]
+        private RenamingNodeItemView()
         {
             InitializeComponent();
             this.WhenActivated(d =>

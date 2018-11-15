@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Threading;
+using System.Windows;
 using FileFormat.Sqlite.Demo.ViewModels;
 using FileFormat.Sqlite.Demo.Views;
 using ReactiveUI;
@@ -11,12 +13,24 @@ namespace FileFormat.Sqlite.Demo
     /// </summary>
     public partial class App : Application
     {
+        [STAThread]
+        static void Main()
+        {
+            App app = new App();
+            app.InitializeComponent();
+            app.Run();
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            Locator.CurrentMutable.Register(() => new NodeItemView(), typeof(IViewFor<NodeItemViewModel>));
-            Locator.CurrentMutable.Register(() => new RenamingNodeItemView(), typeof(IViewFor<RenamingNodeItemViewModel>));
-            Locator.CurrentMutable.Register(() => new DataItemView(), typeof(IViewFor<DataItemViewModel>));
+            
+            //转换为英文版（测试用）
+            //System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture;
+
+            var bootstrapper = new Bootstrapper();
+            bootstrapper.Run();
         }
     }
 }

@@ -10,19 +10,19 @@ namespace FileFormat.Sqlite.Demo
 {
     public static class Helper
     {
-        //public static AdornerLayer GetTopAdornerLayer(this DependencyObject o)
-        //{
-        //    if (o == null)
-        //        return null;
-        //    AdornerLayer topAdornerLayer = null;
-        //    if (o is Visual visual)
-        //    {
-        //        topAdornerLayer = AdornerLayer.GetAdornerLayer(visual);
-        //    }
-        //    if (topAdornerLayer == null)
-        //        return null;
-        //    return VisualTreeHelper.GetParent(o).GetTopAdornerLayer() ?? topAdornerLayer;
-        //}
+        public static AdornerLayer GetTopAdornerLayer(this DependencyObject o)
+        {
+            if (o == null)
+                return null;
+            AdornerLayer topAdornerLayer = null;
+            if (o is Visual visual)
+            {
+                topAdornerLayer = AdornerLayer.GetAdornerLayer(visual);
+            }
+            if (topAdornerLayer == null)
+                return null;
+            return VisualTreeHelper.GetParent(o).GetTopAdornerLayer() ?? topAdornerLayer;
+        }
 
         //public static T FindTree<T>(this DependencyObject o) where T : Visual
         //{

@@ -1,4 +1,5 @@
-﻿using System.Reactive.Disposables;
+﻿using System.ComponentModel.Composition;
+using System.Reactive.Disposables;
 using System.Windows;
 using FileFormat.Sqlite.Demo.ViewModels;
 using ReactiveUI;
@@ -8,9 +9,12 @@ namespace FileFormat.Sqlite.Demo.Views
     /// <summary>
     /// NodeItemView.xaml 的交互逻辑
     /// </summary>
+    [Export(typeof(IViewFor<DataItemViewModel>))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class DataItemView : IViewFor<DataItemViewModel>
     {
-        public DataItemView()
+        [ImportingConstructor]
+        private DataItemView()
         {
             InitializeComponent();
             this.WhenActivated(d =>

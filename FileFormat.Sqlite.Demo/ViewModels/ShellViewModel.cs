@@ -10,19 +10,20 @@ using System.Reactive.Subjects;
 using FileFormat.Sqlite.Demo.Interfaces;
 using System.Windows.Input;
 using DynamicData.Binding;
-using MahApps.Metro.Controls.Dialogs;
 using System.Threading.Tasks;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Windows.Threading;
-using System.Windows;
 using System.IO;
+using System.ComponentModel.Composition;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
+    [Export(typeof(ShellViewModel))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class ShellViewModel : ReactiveObject, ISupportsActivation, INodeManager, IDataManager
     {
-        public ShellViewModel()
+        [ImportingConstructor]
+        private ShellViewModel()
         {
             FilePath = new BehaviorSubject<string>(@"C:\Users\super\Desktop\Test.mrpd");
             this.WhenActivated(d =>
@@ -40,6 +41,11 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 this.WhenAnyValue(s => s.SelectedNodeIndex).Skip(1).Subscribe(SelectedNodeIndexChanged).DisposeWith(d);
                 FilePath.Subscribe(FilePathChanged).DisposeWith(d);
                 FilePath.Select(f => f != null).ToProperty(this, s => s.HasFile, out _hasFile).DisposeWith(d);
+
+                (SaveCommand = ReactiveCommand.Create(async () =>
+                {
+                    await this.ShowProgressAsync("", "正在保存...");
+                })).DisposeWith(d);
             });
         }
 
@@ -53,7 +59,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #region DeleteNodeCommand
 
-        private ReactiveCommand _deleteNodeCommand;
+        private ReactiveCommand<string, Unit> _deleteNodeCommand;
 
         ICommand INodeManager.DeleteNodeCommand => _deleteNodeCommand;
 
@@ -67,7 +73,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #region EnterNodeCommand
 
-        private ReactiveCommand _enterNodeCommand;
+        private ReactiveCommand<string, Unit> _enterNodeCommand;
 
         ICommand INodeManager.EnterNodeCommand => _enterNodeCommand;
 
@@ -88,7 +94,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #region StartRenameNodeCommand
 
-        private ReactiveCommand _startRenameNodeCommand;
+        private ReactiveCommand<string, Unit> _startRenameNodeCommand;
 
         ICommand INodeManager.StartRenameNodeCommand => _startRenameNodeCommand;
 
@@ -102,7 +108,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #region EndRenameNodeCommand
 
-        private ReactiveCommand _endRenameNodeCommand;
+        private ReactiveCommand<(string, string), Unit> _endRenameNodeCommand;
 
         ICommand INodeManager.EndRenameNodeCommand => _endRenameNodeCommand;
 
@@ -119,7 +125,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                 });
                 return;
             }
-            else if(NodeItemViewModelCache.Keys.Contains(newName))
+            else if (NodeItemViewModelCache.Keys.Contains(newName))
             {
                 await this.ShowProgressAsync("警告", "与其他名称重复", 500);
                 var renamingNodeItem = NodeItemViewModelCache.Items.First(i => i is RenamingNodeItemViewModel) as RenamingNodeItemViewModel;
@@ -145,7 +151,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #region DeleteDataCommand
 
-        private ReactiveCommand _deleteDataCommand;
+        private ReactiveCommand<string, Unit> _deleteDataCommand;
 
         ICommand IDataManager.DeleteDataCommand => _deleteDataCommand;
 
@@ -161,15 +167,17 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         private string RootName => "...";
 
-        public ReactiveCommand LoadFileCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> LoadFileCommand { get; private set; }
 
-        public ReactiveCommand CreateFileCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateFileCommand { get; private set; }
 
-        public ReactiveCommand UpCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> UpCommand { get; private set; }
+
+        public ReactiveCommand<Unit, Task> SaveCommand { get; private set; }
 
         #region CreateNodeCommand
 
-        public ReactiveCommand CreateNodeCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateNodeCommand { get; private set; }
 
         private async void CreateNode()
         {

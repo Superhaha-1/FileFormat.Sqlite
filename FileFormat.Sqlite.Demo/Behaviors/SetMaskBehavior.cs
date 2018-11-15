@@ -38,8 +38,7 @@ namespace FileFormat.Sqlite.Demo.Behaviors
                 if (MaskAdorner != null)
                     throw new Exception("掩膜已存在");
                 MaskAdorner = new MaskAdorner(AssociatedObject);
-                //var adornerLayer = AssociatedObject.GetTopAdornerLayer();
-                var adornerLayer = AdornerLayer.GetAdornerLayer(AssociatedObject);
+                var adornerLayer = AssociatedObject.GetTopAdornerLayer();
                 adornerLayer.Add(MaskAdorner);
             }
             else

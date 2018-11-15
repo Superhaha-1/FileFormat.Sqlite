@@ -5,18 +5,22 @@ using FileFormat.Sqlite.Demo.ViewModels;
 using MahApps.Metro.Controls.Dialogs;
 using ReactiveUI;
 using System;
+using System.ComponentModel.Composition;
 
 namespace FileFormat.Sqlite.Demo.Views
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
+    [Export(typeof(Shell))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class Shell : IViewFor<ShellViewModel>
     {
-        public Shell()
+        [ImportingConstructor]
+        private Shell(ShellViewModel viewModel)
         {
             InitializeComponent();
-            ViewModel = new ShellViewModel();
+            ViewModel = viewModel;
             DialogParticipation.SetRegister(this, ViewModel);
             this.WhenActivated(d =>
             {
@@ -28,6 +32,7 @@ namespace FileFormat.Sqlite.Demo.Views
                 this.Bind(ViewModel, vm => vm.SelectedNodeIndex, v => v.ListBox_Nodes.SelectedIndex).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.ItemViewModels, v => v.ListBox_BrowseItem.ItemsSource).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.SelectedItemIndex, v => v.ListBox_BrowseItem.SelectedIndex).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.SaveCommand, v => v.KeyBinding_Save).DisposeWith(d);
             });
         }
 
