@@ -38,15 +38,13 @@ namespace FileFormat.Sqlite
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Node>()
                 .HasMany(n => n.ChildrenNodes)
-                .WithOne()
+                .WithOne(n => n.Parent)
                 .IsRequired(false)
-                .HasForeignKey(n=>n.NodeKey)
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Node>()
                 .HasMany(n => n.ChildrenDatas)
-                .WithOne()
+                .WithOne(d => d.Parent)
                 .IsRequired(true)
-                .HasForeignKey(d=>d.NodeKey)
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
@@ -56,7 +54,25 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         public async Task<Node> GetRootNodeAsync()
         {
-            return await Task.Run(() => Nodes.Find(1));
+            var node = await Task.Run(() => Nodes.Find(1));
+            if (node == null)
+            {
+                node = new Node() { LastWriteTime = DateTime.Now };
+                await Nodes.AddAsync(node);
+                await SaveChangesAsync();
+            }
+            return node;
         }
+
+        public async Task UpdateLastWriteTimeAsync(Node node, DateTime lastWriteTime)
+        {
+            if (node == null)
+                return;
+            node.LastWriteTime = lastWriteTime;
+            var parent = node.Parent
+            var parent = await Entry(node).Reference(n => n.Parent).Query().FirstOrDefaultAsync();
+            await UpdateLastWriteTimeAsync(parent, lastWriteTime);
+        }
+
     }
 }

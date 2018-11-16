@@ -21,15 +21,18 @@ namespace FileFormat.Sqlite.Migrations
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTime>("LastWriteTime");
+
                     b.Property<string>("Name");
 
-                    b.Property<int>("NodeKey");
+                    b.Property<int?>("ParentKey")
+                        .IsRequired();
 
                     b.Property<byte[]>("Value");
 
                     b.HasKey("Key");
 
-                    b.HasIndex("NodeKey");
+                    b.HasIndex("ParentKey");
 
                     b.ToTable("Datas");
                 });
@@ -39,13 +42,15 @@ namespace FileFormat.Sqlite.Migrations
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTime>("LastWriteTime");
+
                     b.Property<string>("Name");
 
-                    b.Property<int?>("NodeKey");
+                    b.Property<int?>("ParentKey");
 
                     b.HasKey("Key");
 
-                    b.HasIndex("NodeKey");
+                    b.HasIndex("ParentKey");
 
                     b.ToTable("Nodes");
                 });
@@ -64,17 +69,17 @@ namespace FileFormat.Sqlite.Migrations
 
             modelBuilder.Entity("FileFormat.Sqlite.Models.Data", b =>
                 {
-                    b.HasOne("FileFormat.Sqlite.Models.Node")
+                    b.HasOne("FileFormat.Sqlite.Models.Node", "Parent")
                         .WithMany("ChildrenDatas")
-                        .HasForeignKey("NodeKey")
+                        .HasForeignKey("ParentKey")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("FileFormat.Sqlite.Models.Node", b =>
                 {
-                    b.HasOne("FileFormat.Sqlite.Models.Node")
+                    b.HasOne("FileFormat.Sqlite.Models.Node", "Parent")
                         .WithMany("ChildrenNodes")
-                        .HasForeignKey("NodeKey")
+                        .HasForeignKey("ParentKey")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

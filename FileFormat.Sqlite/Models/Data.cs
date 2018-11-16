@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace FileFormat.Sqlite.Models
 {
@@ -9,20 +10,22 @@ namespace FileFormat.Sqlite.Models
 
         public string Name { get; set; }
 
+        public DateTime LastWriteTime { get; set; }
+
         public virtual byte[] Value { get; set; }
 
-        public int NodeKey { get; set; }
+        public Node Parent { get; set; }
 
-        private Data()
+        public Data()
         {
 
         }
 
-        public Data(string name, byte[] value, int nodeKey)
-        {
-            Name = name;
-            Value = value;
-            NodeKey = nodeKey;
-        }
+        //public Data(string name, byte[] value, Node parent)
+        //{
+        //    Name = name;
+        //    Value = value;
+        //    Parent = parent;
+        //}
     }
 }

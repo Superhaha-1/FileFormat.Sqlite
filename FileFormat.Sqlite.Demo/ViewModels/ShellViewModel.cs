@@ -25,7 +25,7 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         [ImportingConstructor]
         private ShellViewModel()
         {
-            FilePath = new BehaviorSubject<string>(@"C:\Users\super\Desktop\Test.mrpd");
+            FilePath = new BehaviorSubject<string>(@"Test.mrpd");
             this.WhenActivated(d =>
             {
                 (LoadFileCommand = ReactiveCommand.Create(LoadFile)).DisposeWith(d);
@@ -266,8 +266,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         private async void FilePathChanged(string filePath)
         {
-            if (!File.Exists(filePath))
-                return;
             await this.ShowProgressAsync("请等待", "正在加载文件", async () =>
               {
                   Connection?.Dispose();

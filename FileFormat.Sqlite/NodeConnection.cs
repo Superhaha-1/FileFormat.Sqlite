@@ -118,10 +118,15 @@ namespace FileFormat.Sqlite
             value.ValidateData();
             var data = await GetDataAsync(name);
             if (data == null)
+            {
+                data = new Data() { Name = name, Parent = Node };
                 await Context.Datas
-                    .AddAsync(new Data(name, value, Node.Key));
-            else
-                data.Value = value;
+                    .AddAsync(data);
+            }
+            data.Value = value;
+            var lastWriteTime = DateTime.Now;
+            data.LastWriteTime = lastWriteTime;
+            await Context.UpdateLastWriteTimeAsync(Node, lastWriteTime);
             await Context.SaveChangesAsync();
         }
 
@@ -131,10 +136,8 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         public async Task<string> MoveUpAsync()
         {
-            if (Node.NodeKey == null)
-                throw new Exception("已经是根节点了");
-            Node = await Context.Nodes
-                .FindAsync(Node.NodeKey.Value);
+            var parent = await Context.Entry(Node).Reference(n => n.Parent).Query().SingleAsync();
+            Node = parent ?? throw new Exception("已经是根节点了");
             return Node.Name;
         }
 
@@ -211,6 +214,7 @@ namespace FileFormat.Sqlite
             if (node == null)
                 throw new Exception($"不存在名为{name}的Node");
             node.Name = newName;
+            await Context.UpdateLastWriteTimeAsync(node, DateTime.Now);
             await Context.SaveChangesAsync();
         }
 
@@ -226,6 +230,7 @@ namespace FileFormat.Sqlite
                 throw new Exception($"不存在名为{name}的Node");
             Context.Nodes
                 .Remove(node);
+            await Context.UpdateLastWriteTimeAsync(Node, DateTime.Now);
             await Context.SaveChangesAsync();
         }
 
@@ -240,8 +245,10 @@ namespace FileFormat.Sqlite
             var node = await GetNodeAsync(name);
             if (node == null)
             {
+                node = new Node() { Name = name, Parent = Node };
                 await Context.Nodes
-                    .AddAsync(new Node(name, Node.Key));
+                    .AddAsync(node);
+                await Context.UpdateLastWriteTimeAsync(node, DateTime.Now);
                 await Context.SaveChangesAsync();
             }
             if (isMove)
@@ -260,6 +267,7 @@ namespace FileFormat.Sqlite
                 throw new Exception($"不存在名为{name}的Data");
             Context.Datas
                 .Remove(data);
+            await Context.UpdateLastWriteTimeAsync(Node, DateTime.Now);
             await Context.SaveChangesAsync();
         }
     }
