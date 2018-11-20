@@ -136,7 +136,7 @@ namespace FileFormat.Sqlite
         /// <returns></returns>
         public async Task<string> MoveUpAsync()
         {
-            var parent = await Context.Entry(Node).Reference(n => n.Parent).Query().SingleAsync();
+            var parent = await Context.GetParentAsync(Node);
             Node = parent ?? throw new Exception("已经是根节点了");
             return Node.Name;
         }

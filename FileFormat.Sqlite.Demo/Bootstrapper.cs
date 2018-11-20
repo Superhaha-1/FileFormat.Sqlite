@@ -2,8 +2,11 @@
 using Prism.Mef;
 using System.ComponentModel.Composition.Hosting;
 using Splat;
-using ReactiveUI;
 using FileFormat.Sqlite.Demo.Views;
+using System;
+using System.Reflection;
+using System.Reactive.Linq;
+using ReactiveUI;
 
 namespace FileFormat.Sqlite.Demo
 {

@@ -24,12 +24,19 @@ namespace FileFormat.Sqlite.Demo
             return VisualTreeHelper.GetParent(o).GetTopAdornerLayer() ?? topAdornerLayer;
         }
 
-        //public static T FindTree<T>(this DependencyObject o) where T : Visual
-        //{
-        //    if (o == null)
-        //        return null;
-        //    return o as T ?? FindTree<T>(VisualTreeHelper.GetParent(o));
-        //}
+        public static T FindVisualTree<T>(this DependencyObject o) where T : Visual
+        {
+            if (o == null)
+                return null;
+            return o as T ?? FindVisualTree<T>(VisualTreeHelper.GetParent(o));
+        }
+
+        public static T FindLogicalTree<T>(this DependencyObject o) where T : DependencyObject
+        {
+            if (o == null)
+                return null;
+            return o as T ?? FindLogicalTree<T>(LogicalTreeHelper.GetParent(o));
+        }
 
         //public static DependencyObject GetTop(this DependencyObject o)
         //{

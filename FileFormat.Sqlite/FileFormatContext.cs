@@ -64,13 +64,17 @@ namespace FileFormat.Sqlite
             return node;
         }
 
+        public async Task<Node> GetParentAsync(Node node)
+        {
+            return node.Parent ?? await Entry(node).Reference(n => n.Parent).Query().FirstOrDefaultAsync();
+        }
+
         public async Task UpdateLastWriteTimeAsync(Node node, DateTime lastWriteTime)
         {
             if (node == null)
                 return;
             node.LastWriteTime = lastWriteTime;
-            var parent = node.Parent
-            var parent = await Entry(node).Reference(n => n.Parent).Query().FirstOrDefaultAsync();
+            var parent = await GetParentAsync(node);
             await UpdateLastWriteTimeAsync(parent, lastWriteTime);
         }
 

@@ -5,6 +5,7 @@
                       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:localControls="clr-namespace:FileFormat.Sqlite.Demo.Controls"
                       mc:Ignorable="d"
                       Height="450" Width="800"
                       Title="MainWindow">
@@ -18,6 +19,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Margin="5">
             <MenuItem Header="文件">
@@ -112,5 +114,6 @@
                 </ListBox.ContextMenu>
             </ListBox>
         </Grid>
+        <localControls:ViewModelViewHost x:Name="ViewModelViewHost_SelectedItem" Grid.Row="2"/>
     </Grid>
 </controls:MetroWindow>

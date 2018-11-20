@@ -4,6 +4,8 @@ using FileFormat.Sqlite.Demo.ViewModels;
 using MahApps.Metro.Controls.Dialogs;
 using ReactiveUI;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
+using System;
 
 namespace FileFormat.Sqlite.Demo.Views
 {
@@ -31,6 +33,8 @@ namespace FileFormat.Sqlite.Demo.Views
                 this.OneWayBind(ViewModel, vm => vm.ItemViewModels, v => v.ListBox_BrowseItem.ItemsSource).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.SelectedItemIndex, v => v.ListBox_BrowseItem.SelectedIndex).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.SaveCommand, v => v.KeyBinding_Save).DisposeWith(d);
+
+                this.WhenAnyValue(v => v.ListBox_BrowseItem.SelectedItem).Subscribe(item => ViewModelViewHost_SelectedItem.ViewModel = item).DisposeWith(d);
             });
         }
 

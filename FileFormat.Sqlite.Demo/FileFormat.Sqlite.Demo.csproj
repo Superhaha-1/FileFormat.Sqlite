@@ -262,6 +262,7 @@
     <Compile Include="Behaviors\SetMaskBehavior.cs" />
     <Compile Include="Behaviors\ShowErrorsBehavior.cs" />
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Controls\ViewModelViewHost.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Interfaces\IDataManager.cs" />
