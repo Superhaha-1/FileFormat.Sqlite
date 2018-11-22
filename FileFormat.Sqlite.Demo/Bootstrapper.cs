@@ -3,9 +3,6 @@ using Prism.Mef;
 using System.ComponentModel.Composition.Hosting;
 using Splat;
 using FileFormat.Sqlite.Demo.Views;
-using System;
-using System.Reflection;
-using System.Reactive.Linq;
 using ReactiveUI;
 
 namespace FileFormat.Sqlite.Demo
@@ -37,7 +34,9 @@ namespace FileFormat.Sqlite.Demo
             base.ConfigureContainer();
 
             Locator.CurrentMutable.InitializeSplat();
+            Locator.CurrentMutable.RegisterLazySingleton(() => new WpfDataTemplateBindingHook(), typeof(IPropertyBindingHook));
             Locator.CurrentMutable.InitializeReactiveUI();
+            Locator.CurrentMutable.RegisterLazySingleton(() => new WpfActivationForViewFetcher(), typeof(IActivationForViewFetcher));
             Locator.CurrentMutable.RegisterLazySingleton(() => new MefViewLocator(Container), typeof(IViewLocator));
         }
 

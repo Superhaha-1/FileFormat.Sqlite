@@ -26,7 +26,6 @@ namespace FileFormat.Sqlite.Demo.Views
                 this.BindCommand(ViewModel, vm => vm.RenameCommand, v => v.TextBox_Name, vm => vm.ChangedName, nameof(TextBox_Name.LostKeyboardFocus)).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.NewNameErrors, v => v.ShowErrorsBehavior_TextBox_Name.Errors).DisposeWith(d);
                 this.WhenAnyObservable(v => v.ViewModel.IsFocus).ObserveOnDispatcher(DispatcherPriority.Background).Subscribe(u => TextBox_Name.Focus()).DisposeWith(d);
-                new Disposable(nameof(RenamingNodeItemView)).DisposeWith(d);
             });
         }
 

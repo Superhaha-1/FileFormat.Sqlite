@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.Composition;
-using System.Diagnostics;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Reactive.Disposables;
 using System.Windows;
 using FileFormat.Sqlite.Demo.ViewModels;
@@ -19,6 +19,8 @@ namespace FileFormat.Sqlite.Demo.Views
         {
             InitializeComponent();
 
+            var guid = Guid.NewGuid();
+
             this.WhenActivated(d =>
             {
                 this.BindCommand(ViewModel, vm => vm.EnterCommand, v => v.UserControl_Local, vm => vm.Name, nameof(MouseDoubleClick)).DisposeWith(d);
@@ -26,8 +28,7 @@ namespace FileFormat.Sqlite.Demo.Views
                 this.BindCommand(ViewModel, vm => vm.DeleteCommand, v => v.MenuItem_Delete, vm => vm.Name).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Name, v => v.TextBlock_Name.Text).DisposeWith(d);
 
-
-                new Disposable(ViewModel.Name).DisposeWith(d);
+                new Disposable($"{ViewModel.Name}-{guid}").DisposeWith(d);
             });
         }
 

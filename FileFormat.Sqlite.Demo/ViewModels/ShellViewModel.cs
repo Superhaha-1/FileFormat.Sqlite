@@ -165,16 +165,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
 
         #endregion
 
-        private string RootName => "...";
-
-        public ReactiveCommand<Unit, Unit> LoadFileCommand { get; private set; }
-
-        public ReactiveCommand<Unit, Unit> CreateFileCommand { get; private set; }
-
-        public ReactiveCommand<Unit, Unit> UpCommand { get; private set; }
-
-        public ReactiveCommand<Unit, Task> SaveCommand { get; private set; }
-
         #region CreateNodeCommand
 
         public ReactiveCommand<Unit, Unit> CreateNodeCommand { get; private set; }
@@ -197,6 +187,27 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         }
 
         #endregion
+
+        #region CreateDataCommand
+
+        //public ReactiveCommand<Unit, Unit> CreateDataCommand { get; private set; }
+
+        //private async void CreateData()
+        //{
+            
+        //}
+
+        #endregion
+
+        private string RootName => "...";
+
+        public ReactiveCommand<Unit, Unit> LoadFileCommand { get; private set; }
+
+        public ReactiveCommand<Unit, Unit> CreateFileCommand { get; private set; }
+
+        public ReactiveCommand<Unit, Unit> UpCommand { get; private set; }
+
+        public ReactiveCommand<Unit, Task> SaveCommand { get; private set; }
 
         private SourceList<string> NodeNameList { get; } = new SourceList<string>();
 

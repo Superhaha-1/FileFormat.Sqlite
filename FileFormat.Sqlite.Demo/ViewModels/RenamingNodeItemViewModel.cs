@@ -33,8 +33,6 @@ namespace FileFormat.Sqlite.Demo.ViewModels
                         NewNameErrors = result.Errors;
                     }
                 }).DisposeWith(d);
-
-                new Disposable(nameof(RenamingNodeItemViewModel)).DisposeWith(d);
             });
         }
 

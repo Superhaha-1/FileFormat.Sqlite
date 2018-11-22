@@ -19,7 +19,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Margin="5">
             <MenuItem Header="文件">
@@ -78,7 +77,7 @@
                                     <ControlTemplate TargetType="ListBoxItem">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock x:Name="TextBlock_NodeName"
-                                                       Text="{Binding}"
+                                                       Text="{Binding Mode=OneTime}"
                                                        VerticalAlignment="Center"
                                                        FontSize="18"/>
                                             <iconPacks:PackIconMaterialLight Kind="ChevronRight"
@@ -114,6 +113,5 @@
                 </ListBox.ContextMenu>
             </ListBox>
         </Grid>
-        <localControls:ViewModelViewHost x:Name="ViewModelViewHost_SelectedItem" Grid.Row="2"/>
     </Grid>
 </controls:MetroWindow>
