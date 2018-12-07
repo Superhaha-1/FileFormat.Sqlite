@@ -15,6 +15,7 @@ using System.Reactive;
 using System.Windows.Threading;
 using System.IO;
 using System.ComponentModel.Composition;
+using System.Windows;
 
 namespace FileFormat.Sqlite.Demo.ViewModels
 {
@@ -28,6 +29,11 @@ namespace FileFormat.Sqlite.Demo.ViewModels
             FilePath = new BehaviorSubject<string>(@"Test.mrpd");
             this.WhenActivated(d =>
             {
+                TestCommand = ReactiveCommand.Create(() =>
+                {
+                    TestName = "Test";
+                });
+
                 (LoadFileCommand = ReactiveCommand.Create(LoadFile)).DisposeWith(d);
                 (UpCommand = ReactiveCommand.Create(Up, this.WhenAnyValue(s => s.SelectedNodeIndex).Select(i => i > 0))).DisposeWith(d);
                 (CreateNodeCommand = ReactiveCommand.Create(CreateNode)).DisposeWith(d);
@@ -200,6 +206,23 @@ namespace FileFormat.Sqlite.Demo.ViewModels
         #endregion
 
         private string RootName => "...";
+
+        private string _testName;
+
+        public string TestName
+        {
+            get
+            {
+                return _testName;
+            }
+
+            private set
+            {
+                this.RaiseAndSetIfChanged(ref _testName, value);
+            }
+        }
+
+        public ReactiveCommand<Unit, Unit> TestCommand { get; private set; }
 
         public ReactiveCommand<Unit, Unit> LoadFileCommand { get; private set; }
 

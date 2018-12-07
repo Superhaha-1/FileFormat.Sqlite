@@ -24,14 +24,17 @@ namespace FileFormat.Sqlite.Demo.Views
             DialogParticipation.SetRegister(this, ViewModel);
             this.WhenActivated(d =>
             {
+                this.BindCommand(ViewModel, vm => vm.TestCommand, v => v.MenuItem_Test).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.TestName, v => v.TextBox_Test.Text).DisposeWith(d);
+
                 this.BindCommand(ViewModel, vm => vm.LoadFileCommand, v => v.MenuItem_LoadFile).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.UpCommand, v => v.Button_Up).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.CreateNodeCommand, v => v.MenuItem_CreateNode).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.HasFile, v => v.Grid_Content.Visibility).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.NodeNames, v => v.ListBox_Nodes.ItemsSource).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.SelectedNodeIndex, v => v.ListBox_Nodes.SelectedIndex).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.ItemViewModels, v => v.ListBox_BrowseItem.ItemsSource).DisposeWith(d);
-                this.Bind(ViewModel, vm => vm.SelectedItemIndex, v => v.ListBox_BrowseItem.SelectedIndex).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.ItemViewModels, v => v.ListBox_BrowseItems.ItemsSource).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.SelectedItemIndex, v => v.ListBox_BrowseItems.SelectedIndex).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.SaveCommand, v => v.KeyBinding_Save).DisposeWith(d);
             });
         }

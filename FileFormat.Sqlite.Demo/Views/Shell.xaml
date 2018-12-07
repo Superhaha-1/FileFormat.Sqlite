@@ -26,6 +26,8 @@
                           Header="加载文件"/>
                 <MenuItem x:Name="MenuItem_CreateFile"
                           Header="新建文件"/>
+                <MenuItem x:Name="MenuItem_Test"
+                          Header="测试"/>
             </MenuItem>
         </Menu>
         <Grid x:Name="Grid_Content"
@@ -99,8 +101,9 @@
                         </Style>
                     </ListBox.ItemContainerStyle>
                 </ListBox>
+                <TextBox x:Name="TextBox_Test"/>
             </StackPanel>
-            <ListBox x:Name="ListBox_BrowseItem"
+            <ListBox x:Name="ListBox_BrowseItems"
                      Grid.Row="1"
                      Margin="5"
                      BorderThickness="1"
